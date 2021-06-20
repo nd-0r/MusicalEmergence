@@ -6,5 +6,3 @@
 //
 
 #include <catch.hpp>
-
-
