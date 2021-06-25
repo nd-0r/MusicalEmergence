@@ -95,3 +95,4 @@ DerivedData/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 project.xcworkspace
+xcuserdata
