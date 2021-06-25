@@ -10,4 +10,8 @@
 
 #include <stdio.h>
 
+namespace synchrony {
+
+} // namespace synchrony
+
 #endif /* MidiParticle_hpp */

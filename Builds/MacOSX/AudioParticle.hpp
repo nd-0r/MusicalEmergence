@@ -10,4 +10,8 @@
 
 #include <stdio.h>
 
+namespace synchrony {
+
+} // namespace synchrony
+
 #endif /* AudioParticle_hpp */
