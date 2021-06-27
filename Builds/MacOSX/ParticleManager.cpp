@@ -28,6 +28,33 @@ void ParticleManager::FindCollisions() {
   SortAxisAndFindCandidates(positions_y_);
 }
 
+void ParticleManager::ResolveCollisions() {
+  std::list<std::pair<Particle*, Particle*>>::iterator iter =
+      collision_candidate_pairs_.begin();
+  
+  // do while candidates is populated and iterator not exhausted
+  while (!collision_candidate_pairs_.empty() ||
+         iter != collision_candidate_pairs_.end()) {
+    Particle* p1 = (*iter).first;
+    Particle* p2 = (*iter).second;
+    if (Particle::DoParticlesCollide(*p1, *p2)) {
+      vmml::Vector2f vel1_new = Particle::CalcCollisionVelocity(*p1, *p2);
+      vmml::Vector2f vel2_new = Particle::CalcCollisionVelocity(*p2, *p1);
+      
+      p1->SetVelocity(vel1_new);
+      p2->SetVelocity(vel2_new);
+    }
+    
+    if (!p1->is_collision_candidate && !p2->is_collision_candidate) {
+      // particles no longer in striking range
+      collision_candidate_pairs_.erase(iter);
+      continue;
+    }
+    
+    ++iter;
+  }
+}
+
 void ParticleManager::InsertSorted(std::vector<EndPoint*>& end_points,
                                    const std::pair<EndPoint*, EndPoint*>& bounds,
                                    size_t start_idx = 0) {
