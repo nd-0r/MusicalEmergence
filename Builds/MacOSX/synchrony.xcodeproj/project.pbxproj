@@ -812,6 +812,7 @@
 		099A31C9B27C9C38C87E0299 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				SDKROOT = macosx;
 			};
@@ -1019,6 +1020,7 @@
 					/Applications/JUCE/modules,
 					/Applications/JUCE/modules/juce_audio_plugin_client,
 					"$(inherited)",
+					"/usr/local/include/vmmlib/**",
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
@@ -1259,6 +1261,7 @@
 		63A5097A76DB190371919387 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				SDKROOT = macosx;
 			};
@@ -1287,6 +1290,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include/vmmlib;
 				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1322,7 +1326,10 @@
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include/catch2;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					/usr/local/include/catch2,
+					/usr/local/include/vmmlib,
+				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib/cmake/Catch2;
 				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1874,6 +1881,7 @@
 					/Applications/JUCE/modules,
 					/Applications/JUCE/modules/juce_audio_plugin_client,
 					"$(inherited)",
+					"/usr/local/include/vmmlib/**",
 				);
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LLVM_LTO = YES;

@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 #include <juce_graphics/juce_graphics.h>
+#include <vector.hpp>
+#include "Physics.hpp"
 
 namespace synchrony {
 
@@ -18,29 +20,44 @@ public:
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
            float radius,
+           float mass,
            const juce::Colour& color);
   void Draw(juce::Graphics& g) const;
   void UpdatePosition();
-  void UpdateVelocity(juce::Point<float> new_velocity);
+  void SetVelocity(vmml::Vector2f new_velocity);
   
   bool operator==(const Particle& other_particle) const;
   
   bool operator!=(const Particle& other_particle) const;
   
-  const juce::Point<float>& GetInitialPosition() const;
-  const juce::Point<float>& GetCurrentPosition() const;
-  const juce::Point<float>& GetVelocity() const;
+  const vmml::Vector2f& GetInitialPosition() const;
+  const vmml::Vector2f& GetCurrentPosition() const;
+  const vmml::Vector2f& GetVelocity() const;
   float GetRadius() const;
+  float GetMass() const;
   const juce::Colour& GetColor() const;
-    
-private:
-  juce::Point<float> CalculateCurrentPosition() const;
+  const AxisAlignedBoundingBox* GetBoundingBox() const;
   
-  unsigned int time_;
-  juce::Point<float> initial_position_;
-  juce::Point<float> current_position_;
-  juce::Point<float> velocity_;
+  static bool DoParticlesCollide(const Particle& particle1,
+                                 const Particle& particle2);
+  static vmml::Vector2f CalcCollisionVelocity(const Particle& particle1,
+                                              const Particle& particle2);
+  
+  bool is_collision_candidate = false;
+  
+private:
+  vmml::Vector2f CalculateCurrentPosition() const;
+  
+  static bool AreParticlesApproaching(const Particle& particle1,
+                                      const Particle& particle2);
+  
+  unsigned int time_ = 0;
+  vmml::Vector2f initial_position_;
+  vmml::Vector2f current_position_;
+  vmml::Vector2f velocity_;
+  float mass_;
   float radius_;
+  AxisAlignedBoundingBox bounding_box_;
   juce::Colour color_;
   
 };
