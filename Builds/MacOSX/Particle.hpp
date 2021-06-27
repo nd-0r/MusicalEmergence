@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <juce_graphics/juce_graphics.h>
 #include <vector.hpp>
-#include "Physics.hpp"
+#include "ParticleManager.hpp"
 
 namespace synchrony {
 

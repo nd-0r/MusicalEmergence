@@ -67,7 +67,7 @@
 		6BAA453B267E6D810047A475 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C979A0126BE3D28D21BC096 /* WebKit.framework */; };
 		6BAA454C267E70890047A475 /* test_main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BAA454B267E70890047A475 /* test_main.cpp */; };
 		6BAA4552267E71ED0047A475 /* test_plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BAA4544267E6F270047A475 /* test_plugin.cpp */; };
-		6BAA4558267FCE5C0047A475 /* Physics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BAA4554267FCD7A0047A475 /* Physics.cpp */; };
+		6BAA4558267FCE5C0047A475 /* ParticleManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BAA4554267FCD7A0047A475 /* ParticleManager.cpp */; };
 		6BAA4559267FCE5C0047A475 /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BAA4556267FCDA40047A475 /* Particle.cpp */; };
 		6D5CBE4E43907025729323B6 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7743107312C78CCD361C670D /* Accelerate.framework */; };
 		6F847168C22AEC93A9C27D36 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C979A0126BE3D28D21BC096 /* WebKit.framework */; };
@@ -176,8 +176,8 @@
 		6BAA4544267E6F270047A475 /* test_plugin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_plugin.cpp; sourceTree = "<group>"; };
 		6BAA4549267E70890047A475 /* synchrony-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "synchrony-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BAA454B267E70890047A475 /* test_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_main.cpp; sourceTree = "<group>"; };
-		6BAA4554267FCD7A0047A475 /* Physics.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Physics.cpp; sourceTree = "<group>"; };
-		6BAA4555267FCD7A0047A475 /* Physics.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Physics.hpp; sourceTree = "<group>"; };
+		6BAA4554267FCD7A0047A475 /* ParticleManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleManager.cpp; sourceTree = "<group>"; };
+		6BAA4555267FCD7A0047A475 /* ParticleManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParticleManager.hpp; sourceTree = "<group>"; };
 		6BAA4556267FCDA40047A475 /* Particle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Particle.cpp; sourceTree = "<group>"; };
 		6BAA4557267FCDA40047A475 /* Particle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Particle.hpp; sourceTree = "<group>"; };
 		6C6416D14A96CAED2DC44F15 /* synchrony.vst3 */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = synchrony.vst3; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -373,8 +373,8 @@
 		6BAA455C267FCF090047A475 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				6BAA4554267FCD7A0047A475 /* Physics.cpp */,
-				6BAA4555267FCD7A0047A475 /* Physics.hpp */,
+				6BAA4554267FCD7A0047A475 /* ParticleManager.cpp */,
+				6BAA4555267FCD7A0047A475 /* ParticleManager.hpp */,
 				6BAA4556267FCDA40047A475 /* Particle.cpp */,
 				6BAA4557267FCDA40047A475 /* Particle.hpp */,
 			);
@@ -730,7 +730,7 @@
 				6BAA4559267FCE5C0047A475 /* Particle.cpp in Sources */,
 				E458EAE509125FF85E2CCF2F /* include_juce_gui_basics.mm in Sources */,
 				AA4244A39881D32B35C44236 /* include_juce_gui_extra.mm in Sources */,
-				6BAA4558267FCE5C0047A475 /* Physics.cpp in Sources */,
+				6BAA4558267FCE5C0047A475 /* ParticleManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
