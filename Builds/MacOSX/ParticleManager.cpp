@@ -17,6 +17,12 @@ void ParticleManager::AddParticle(const Particle& new_particle) {
   InsertSorted(positions_y_, new_particle_box->bounds_y);
 }
 
+void ParticleManager::UpdateParticles() {
+  for (Particle& particle : particles_) {
+    particle.UpdatePosition();
+  }
+}
+
 void ParticleManager::InsertSorted(std::vector<EndPoint*>& end_points,
                                    const std::pair<EndPoint*, EndPoint*>& bounds,
                                    size_t start_idx = 0) {
