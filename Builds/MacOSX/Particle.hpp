@@ -5,13 +5,13 @@
 //  Created by Andrew Orals on 6/20/21.
 //
 
-#ifndef Particle_hpp
-#define Particle_hpp
+#pragma once
 
 #include <stdio.h>
 #include <juce_graphics/juce_graphics.h>
 #include <vector.hpp>
 #include "ParticleManager.hpp"
+#include "Utilities.hpp"
 
 namespace synchrony {
 
@@ -63,5 +63,3 @@ private:
 };
 
 } // namespace synchrony
-
-#endif /* Particle_hpp */

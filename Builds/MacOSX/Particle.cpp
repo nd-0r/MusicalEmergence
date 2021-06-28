@@ -20,10 +20,10 @@ Particle::Particle(const juce::Point<float>& init_pos,
   current_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
   velocity_ = vmml::Vector2f(init_vel.x, init_vel.y);
 
-  EndPoint low_x(this, current_position_.x - radius_, true);
-  EndPoint high_x(this, current_position_.x + radius_, false);
-  EndPoint low_y(this, current_position_.y - radius_, true);
-  EndPoint high_y(this, current_position_.y + radius_, false);
+  EndPoint low_x(this, current_position_.x() - radius_, true);
+  EndPoint high_x(this, current_position_.x() + radius_, false);
+  EndPoint low_y(this, current_position_.y() - radius_, true);
+  EndPoint high_y(this, current_position_.y() + radius_, false);
   
   bounding_box_.bounds_x = std::pair<EndPoint*, EndPoint*>(&low_x, &high_x);
   bounding_box_.bounds_y = std::pair<EndPoint*, EndPoint*>(&low_y, &high_y);
@@ -38,10 +38,10 @@ void Particle::Draw(juce::Graphics& g) const {
 void Particle::UpdatePosition() {
   current_position_ = velocity_ * time_;
   
-  bounding_box_.bounds_x.first->value = current_position_.x - radius_;
-  bounding_box_.bounds_x.second->value = current_position_.x + radius_;
-  bounding_box_.bounds_y.first->value = current_position_.y - radius_;
-  bounding_box_.bounds_y.second->value = current_position_.y + radius_;
+  bounding_box_.bounds_x.first->value = current_position_.x() - radius_;
+  bounding_box_.bounds_x.second->value = current_position_.x() + radius_;
+  bounding_box_.bounds_y.first->value = current_position_.y() - radius_;
+  bounding_box_.bounds_y.second->value = current_position_.y() + radius_;
   
   ++time_;
 }
