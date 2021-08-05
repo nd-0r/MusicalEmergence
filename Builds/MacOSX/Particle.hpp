@@ -8,21 +8,23 @@
 #pragma once
 
 #include <stdio.h>
-#include <juce_graphics/juce_graphics.h>
+#include <JuceHeader.h>
 #include <vector.hpp>
 #include "ParticleManager.hpp"
 #include "Utilities.hpp"
 
 namespace synchrony {
 
-class Particle {
+class Particle: public juce::Component {
 public:
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
            float radius,
            float mass,
            const juce::Colour& color);
-  void Draw(juce::Graphics& g) const;
+  Particle(const Particle& other);
+  ~Particle() override;
+  void paint(juce::Graphics& g) override;
   void UpdatePosition();
   void SetVelocity(vmml::Vector2f new_velocity);
   

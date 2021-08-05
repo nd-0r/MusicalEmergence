@@ -29,7 +29,22 @@ Particle::Particle(const juce::Point<float>& init_pos,
   bounding_box_.bounds_y = std::pair<EndPoint*, EndPoint*>(&low_y, &high_y);
 }
 
-void Particle::Draw(juce::Graphics& g) const {
+Particle::Particle(const Particle& other) {
+  time_ = other.time_;
+  initial_position_ = other.initial_position_;
+  current_position_ = other.current_position_;
+  velocity_ = other.velocity_;
+  mass_ = other.mass_;
+  radius_ = other.radius_;
+  bounding_box_ = other.bounding_box_;
+  color_ = other.color_;
+}
+
+Particle::~Particle() {
+  // No dynamic storage to manage
+}
+
+void Particle::paint(juce::Graphics& g) {
   g.fillEllipse(current_position_.x(),
                 current_position_.y(),
                 radius_ * 2, radius_ * 2);
