@@ -18,10 +18,13 @@ void ParticleManager::AddParticle(const Particle& new_particle) {
   InsertSorted(positions_y_, new_particle_box->bounds_y);
 }
 
-void ParticleManager::UpdateParticles() {
+void ParticleManager::update() {
   for (Particle& particle : particles_) {
     particle.UpdatePosition();
   }
+  
+  FindCollisions();
+  ResolveCollisions();
 }
 
 void ParticleManager::FindCollisions() {

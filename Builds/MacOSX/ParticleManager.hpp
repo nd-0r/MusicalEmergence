@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <JuceHeader.h>
 #include "Particle.hpp"
 #include "Utilities.hpp"
 
@@ -15,10 +15,10 @@ namespace synchrony {
 
 class Particle;
 
-class ParticleManager {
+class ParticleManager: public juce::AnimatedAppComponent {
 public:
   void AddParticle(const Particle& new_particle);
-  void UpdateParticles();
+  void update() override;
   void FindCollisions();
   void ResolveCollisions();
   void RemoveParticle(const Particle& particle_to_remove);
