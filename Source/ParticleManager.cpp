@@ -5,7 +5,7 @@
 //  Created by Andrew Orals on 6/20/21.
 //
 
-#include "ParticleManager.hpp"
+#include "ParticleManager.h"
 
 namespace synchrony {
 
@@ -25,6 +25,10 @@ void ParticleManager::update() {
   
   FindCollisions();
   ResolveCollisions();
+}
+
+void ParticleManager::paint(juce::Graphics& g) {
+  
 }
 
 void ParticleManager::FindCollisions() {

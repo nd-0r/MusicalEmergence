@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="HO2u01" name="synchrony" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginVST3Category="Instrument" headerPath="/usr/local/include/catch2&#10;/usr/local/include/vmmlib">
   <MAINGROUP id="Oz8per" name="synchrony">
     <GROUP id="{8B7AEF32-EDD5-5D1B-85AF-951D2281DCBD}" name="Source">
+      <GROUP id="{57AC3864-8276-546B-695B-C2BACDDE7B8A}" name="Test">
+        <FILE id="pIH066" name="test_main.cpp" compile="1" resource="0" file="Source/test_main.cpp"/>
+        <FILE id="G61P7A" name="test_plugin.cpp" compile="1" resource="0" file="Source/test_plugin.cpp"/>
+      </GROUP>
+      <GROUP id="{0215D8C2-5F11-5356-72FC-3EB4EB6E6355}" name="Core">
+        <FILE id="yCbtqG" name="Particle.cpp" compile="1" resource="0" file="Source/Particle.cpp"/>
+        <FILE id="f9g5eS" name="Particle.h" compile="0" resource="0" file="Source/Particle.h"/>
+        <FILE id="YmAHQF" name="ParticleManager.cpp" compile="1" resource="0"
+              file="Source/ParticleManager.cpp"/>
+        <FILE id="vSZ9A6" name="ParticleManager.h" compile="0" resource="0"
+              file="Source/ParticleManager.h"/>
+        <FILE id="zHqZ2q" name="Utilities.h" compile="0" resource="0" file="Source/Utilities.h"/>
+      </GROUP>
       <FILE id="Yqmrq6" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="TSNAx7" name="PluginProcessor.h" compile="0" resource="0"
@@ -17,8 +31,11 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="synchrony"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="synchrony"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="synchrony" headerPath="/usr/local/include/catch2&#10;/usr/local/include/vmmlib"
+                       recommendedWarnings="LLVM"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="synchrony" headerPath="/usr/local/include/catch2&#10;/usr/local/include/vmmlib"/>
+        <CONFIGURATION isDebug="1" name="Test" headerPath="/usr/local/include/catch2&#10;/usr/local/include/vmmlib"
+                       recommendedWarnings="LLVM" optimisation="1" linkTimeOptimisation="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../Applications/JUCE/modules"/>

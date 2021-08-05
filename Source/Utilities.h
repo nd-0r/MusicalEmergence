@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Particle.hpp"
+#include "Particle.h"
 #include <stdio.h>
 
 namespace synchrony {

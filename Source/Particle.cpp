@@ -5,7 +5,7 @@
 //  Created by Andrew Orals on 6/20/21.
 //
 
-#include "Particle.hpp"
+#include "Particle.h"
 
 namespace synchrony {
 

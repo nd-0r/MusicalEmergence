@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <JuceHeader.h>
 #include <vector.hpp>
-#include "ParticleManager.hpp"
-#include "Utilities.hpp"
+#include "ParticleManager.h"
+#include "Utilities.h"
 
 namespace synchrony {
 

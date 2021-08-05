@@ -18,9 +18,7 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
     setSize (400, 300);
 }
 
-SynchronyAudioProcessorEditor::~SynchronyAudioProcessorEditor()
-{
-}
+SynchronyAudioProcessorEditor::~SynchronyAudioProcessorEditor() {}
 
 //==============================================================================
 void SynchronyAudioProcessorEditor::paint (juce::Graphics& g)
