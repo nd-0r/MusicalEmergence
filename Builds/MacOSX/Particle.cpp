@@ -79,6 +79,8 @@ bool Particle::DoParticlesCollide(const Particle& particle1,
     // Collide if distance between particles is less than sum of their radii
     return distance <= particle1_rad + particle2_rad;
   }
+  
+  return false;
 }
 
 vmml::Vector2f Particle::CalcCollisionVelocity(const Particle& particle1,
