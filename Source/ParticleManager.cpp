@@ -28,7 +28,7 @@ void ParticleManager::update() {
 }
 
 void ParticleManager::paint(juce::Graphics& g) {
-  
+  g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
 void ParticleManager::FindCollisions() {
@@ -45,12 +45,32 @@ void ParticleManager::ResolveCollisions() {
          iter != collision_candidate_pairs_.end()) {
     Particle* p1 = (*iter).first;
     Particle* p2 = (*iter).second;
+    
+    // Handle collision between particles
     if (Particle::DoParticlesCollide(*p1, *p2)) {
       vmml::Vector2f vel1_new = Particle::CalcCollisionVelocity(*p1, *p2);
       vmml::Vector2f vel2_new = Particle::CalcCollisionVelocity(*p2, *p1);
       
       p1->SetVelocity(vel1_new);
       p2->SetVelocity(vel2_new);
+    }
+    
+    // Handle collision between particle and wall
+    for (Particle* p : {p1, p2}) {
+      float x_vel = p->GetVelocity().x();
+      float y_vel = p->GetVelocity().y();
+      
+      if ((y_vel < 0 && p->GetCurrentPosition().y() - p->GetRadius() < 0) ||
+          (y_vel > 0 && p->GetCurrentPosition().y() + p->GetRadius() > screen_size_y_)) {
+        y_vel *= -1;
+        p->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+      }
+      
+      if ((x_vel < 0 && p->GetCurrentPosition().x() - p->GetRadius() < 0) ||
+          (x_vel > 0 && p->GetCurrentPosition().x() + p->GetRadius() > screen_size_x_)) {
+        x_vel *= -1;
+        p->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+      }
     }
     
     if (!p1->is_collision_candidate && !p2->is_collision_candidate) {
