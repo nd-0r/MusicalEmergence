@@ -29,8 +29,6 @@ public:
   void ResolveCollisions();
   void RemoveParticle(const Particle& particle_to_remove);
   
-  
-  
 private:
   void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis);
 

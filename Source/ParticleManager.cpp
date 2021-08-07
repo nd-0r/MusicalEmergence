@@ -12,8 +12,7 @@ namespace synchrony {
 void ParticleManager::AddParticle(const Particle& new_particle) {
   particles_.push_back(new_particle);
   
-  const AxisAlignedBoundingBox* new_particle_box =
-    new_particle.GetBoundingBox();
+  const AxisAlignedBoundingBox* new_particle_box = new_particle.GetBoundingBox();
   InsertSorted(positions_x_, new_particle_box->bounds_x);
   InsertSorted(positions_y_, new_particle_box->bounds_y);
 }
@@ -28,7 +27,7 @@ void ParticleManager::update() {
 }
 
 void ParticleManager::paint(juce::Graphics& g) {
-  g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+  g.fillAll(juce::Colours::black);
 }
 
 void ParticleManager::FindCollisions() {
@@ -82,6 +81,10 @@ void ParticleManager::ResolveCollisions() {
     ++iter;
   }
 }
+
+//void ParticleManager::RemoveParticle(const Particle& particle_to_remove) {
+//
+//}
 
 void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis) {
   for (size_t key_idx = 0; key_idx < axis.size(); ++key_idx) {
