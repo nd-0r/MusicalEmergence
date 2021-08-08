@@ -68,18 +68,23 @@ void Particle::UpdatePosition() {
   ++time_;
 }
 
+void Particle::SetId(int to_id) {
+  id_ = to_id;
+}
+
 void Particle::SetVelocity(vmml::Vector2f new_velocity) {
+  initial_position_ = current_position_;
   velocity_ = new_velocity;
   time_ = 0;
 }
 
-bool Particle::DoParticlesCollide(const Particle& particle1,
-                                  const Particle& particle2) {
-  if (AreParticlesApproaching(particle1, particle1)) {
-    vmml::Vector2f particle1_pos = particle1.GetCurrentPosition();
-    float particle1_rad = particle1.GetRadius();
-    vmml::Vector2f particle2_pos = particle2.GetCurrentPosition();
-    float particle2_rad = particle2.GetRadius();
+bool Particle::DoParticlesCollide(const Particle* particle1,
+                                  const Particle* particle2) {
+  if (AreParticlesApproaching(particle1, particle2)) {
+    vmml::Vector2f particle1_pos = particle1->GetCurrentPosition();
+    float particle1_rad = particle1->GetRadius();
+    vmml::Vector2f particle2_pos = particle2->GetCurrentPosition();
+    float particle2_rad = particle2->GetRadius();
 
     float distance = particle1_pos.distance(particle2_pos);
 
@@ -90,14 +95,14 @@ bool Particle::DoParticlesCollide(const Particle& particle1,
   return false;
 }
 
-vmml::Vector2f Particle::CalcCollisionVelocity(const Particle& particle1,
-                                               const Particle& particle2) {
-  float m1 = particle1.GetMass();
-  float m2 = particle2.GetMass();
-  auto v1 = particle1.GetVelocity();
-  auto v2 = particle2.GetVelocity();
-  auto x1 = particle1.GetCurrentPosition();
-  auto x2 = particle2.GetCurrentPosition();
+vmml::Vector2f Particle::CalcCollisionVelocity(const Particle* particle1,
+                                               const Particle* particle2) {
+  float m1 = particle1->GetMass();
+  float m2 = particle2->GetMass();
+  auto v1 = particle1->GetVelocity();
+  auto v2 = particle2->GetVelocity();
+  auto x1 = particle1->GetCurrentPosition();
+  auto x2 = particle2->GetCurrentPosition();
   
   const float mass_ratio = 2 * m2 / (m1 + m2);
   const float scalar = vmml::dot(v1 - v2, x1 - x2) / ((x1 - x2).length() * (x1 - x2).length());
@@ -139,16 +144,16 @@ const juce::Colour& Particle::GetColor() const {
   return color_;
 }
 
-const AxisAlignedBoundingBox* Particle::GetBoundingBox() const {
+AxisAlignedBoundingBox* Particle::GetBoundingBox() {
   return &bounding_box_;
 }
 
-bool Particle::AreParticlesApproaching(const Particle& particle1,
-                                       const Particle& particle2) {
-  const vmml::Vector2f v1 = particle1.GetVelocity();
-  const vmml::Vector2f v2 = particle2.GetVelocity();
-  const vmml::Vector2f x1 = particle1.GetCurrentPosition();
-  const vmml::Vector2f x2 = particle2.GetCurrentPosition();
+bool Particle::AreParticlesApproaching(const Particle* particle1,
+                                       const Particle* particle2) {
+  const vmml::Vector2f v1 = particle1->GetVelocity();
+  const vmml::Vector2f v2 = particle2->GetVelocity();
+  const vmml::Vector2f x1 = particle1->GetCurrentPosition();
+  const vmml::Vector2f x2 = particle2->GetCurrentPosition();
 
   return vmml::dot(v1 - v2, x1 - x2) < 0;
 }

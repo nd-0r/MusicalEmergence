@@ -19,49 +19,53 @@ class Particle: public juce::Component {
 public:
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
-           float radius,
+           int radius,
            float mass,
            const juce::Colour& color);
   Particle(const Particle& other);
   ~Particle() override;
+  void CreateBoundingBox();
+  
   void paint(juce::Graphics& g) override;
   void UpdatePosition();
+  void SetId(int to_id);
   void SetVelocity(vmml::Vector2f new_velocity);
   
   bool operator==(const Particle& other_particle) const;
   
   bool operator!=(const Particle& other_particle) const;
   
+  int GetId() const;
   const vmml::Vector2f& GetInitialPosition() const;
   const vmml::Vector2f& GetCurrentPosition() const;
   const vmml::Vector2f& GetVelocity() const;
-  float GetRadius() const;
+  int GetRadius() const;
   float GetMass() const;
   const juce::Colour& GetColor() const;
-  const AxisAlignedBoundingBox* GetBoundingBox() const;
+  AxisAlignedBoundingBox* GetBoundingBox();
   
-  static bool DoParticlesCollide(const Particle& particle1,
-                                 const Particle& particle2);
-  static vmml::Vector2f CalcCollisionVelocity(const Particle& particle1,
-                                              const Particle& particle2);
+  static bool DoParticlesCollide(const Particle* particle1,
+                                 const Particle* particle2);
+  static vmml::Vector2f CalcCollisionVelocity(const Particle* particle1,
+                                              const Particle* particle2);
   
   bool is_collision_candidate = false;
   
 private:
   vmml::Vector2f CalculateCurrentPosition() const;
   
-  static bool AreParticlesApproaching(const Particle& particle1,
-                                      const Particle& particle2);
+  static bool AreParticlesApproaching(const Particle* particle1,
+                                      const Particle* particle2);
   
+  int id_;
   unsigned int time_ = 0;
   vmml::Vector2f initial_position_;
   vmml::Vector2f current_position_;
   vmml::Vector2f velocity_;
   float mass_;
-  float radius_;
+  int radius_;
   AxisAlignedBoundingBox bounding_box_;
   juce::Colour color_;
-  
 };
 
 } // namespace synchrony
