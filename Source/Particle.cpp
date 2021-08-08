@@ -11,47 +11,54 @@ namespace synchrony {
 
 Particle::Particle(const juce::Point<float>& init_pos,
                    const juce::Point<float>& init_vel,
-                   float radius=1,
+                   int radius=1,
                    float mass=10,
                    const juce::Colour& color=juce::Colour(255, 255, 255)) :
+                    mass_(mass),
                     radius_(radius),
                     color_(color) {
   initial_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
   current_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
   velocity_ = vmml::Vector2f(init_vel.x, init_vel.y);
-
-  EndPoint low_x(this, current_position_.x() - radius_, true);
-  EndPoint high_x(this, current_position_.x() + radius_, false);
-  EndPoint low_y(this, current_position_.y() - radius_, true);
-  EndPoint high_y(this, current_position_.y() + radius_, false);
-  
-  bounding_box_.bounds_x = std::pair<EndPoint*, EndPoint*>(&low_x, &high_x);
-  bounding_box_.bounds_y = std::pair<EndPoint*, EndPoint*>(&low_y, &high_y);
+  CreateBoundingBox();
 }
 
 Particle::Particle(const Particle& other) {
+  id_ = other.id_;
   time_ = other.time_;
   initial_position_ = other.initial_position_;
   current_position_ = other.current_position_;
   velocity_ = other.velocity_;
   mass_ = other.mass_;
   radius_ = other.radius_;
-  bounding_box_ = other.bounding_box_;
   color_ = other.color_;
+  CreateBoundingBox();
 }
 
 Particle::~Particle() {
   // No dynamic storage to manage
 }
 
+void Particle::CreateBoundingBox() {
+  EndPoint* low_x = new EndPoint(this, current_position_.x() - radius_, true);
+  EndPoint* high_x = new EndPoint(this, current_position_.x() + radius_, false);
+  EndPoint* low_y = new EndPoint(this, current_position_.y() - radius_, true);
+  EndPoint* high_y = new EndPoint(this, current_position_.y() + radius_, false);
+                      
+  bounding_box_ = AxisAlignedBoundingBox(low_x, high_x, low_y, high_y);
+}
+
 void Particle::paint(juce::Graphics& g) {
-  g.fillEllipse(current_position_.x(),
-                current_position_.y(),
-                radius_ * 2, radius_ * 2);
+  g.setColour(color_);
+  g.fillEllipse(0, 0, radius_ * 2, radius_ * 2);
 }
 
 void Particle::UpdatePosition() {
-  current_position_ = velocity_ * time_;
+  current_position_ = initial_position_ + (velocity_ * time_);
+  setBounds((int) current_position_.x() - radius_,
+            (int) current_position_.y() - radius_,
+            radius_ * 2,
+            radius_ * 2);
   
   bounding_box_.bounds_x.first->value = current_position_.x() - radius_;
   bounding_box_.bounds_x.second->value = current_position_.x() + radius_;
