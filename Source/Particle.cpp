@@ -120,6 +120,10 @@ bool Particle::operator!=(const Particle& other_particle) const {
   return !operator==(other_particle);
 }
 
+int Particle::GetId() const {
+  return id_;
+}
+
 const vmml::Vector2f& Particle::GetInitialPosition() const {
   return initial_position_;
 }
@@ -132,7 +136,7 @@ const vmml::Vector2f& Particle::GetVelocity() const {
   return velocity_;
 }
 
-float Particle::GetRadius() const {
+int Particle::GetRadius() const {
   return radius_;
 }
 
