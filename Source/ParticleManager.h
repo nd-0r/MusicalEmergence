@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define MAX_PARTICLES 600
+
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Particle.h"
@@ -22,7 +24,7 @@ public:
     setFramesPerSecond(60);
   }
   
-  void AddParticle(const Particle& new_particle);
+  void AddParticle(Particle& new_particle);
   void update() override;
   void paint(juce::Graphics& g) override;
   void FindCollisions();
@@ -35,11 +37,9 @@ private:
   static void InsertSorted(std::vector<EndPoint*>& end_points,
                            const std::pair<EndPoint*, EndPoint*>& bounds,
                            size_t start_idx = 0);
-  
-  size_t screen_size_x_;
-  size_t screen_size_y_;
-  
-  std::vector<Particle> particles_;
+
+  bool overlap_matrix_[MAX_PARTICLES][MAX_PARTICLES];
+  std::vector<std::unique_ptr<Particle>> particles_;
   std::vector<EndPoint*> positions_x_;
   std::vector<EndPoint*> positions_y_;
   std::list<std::pair<Particle*, Particle*>> collision_candidate_pairs_;
