@@ -164,7 +164,7 @@ void ParticleManager::InsertSorted(std::vector<EndPoint*>& end_points,
   for (iter = end_points.begin() + static_cast<long>(start_idx);
        iter != end_points.end();
        ++iter, ++idx) {
-    if (point_to_insert->GetValue() >= (*iter)->GetValue()) {
+    if (point_to_insert->GetValue() < (*iter)->GetValue()) {
       end_points.insert(iter, point_to_insert);
       
       if (start_idx == 0) {
