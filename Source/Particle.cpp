@@ -40,30 +40,32 @@ Particle::~Particle() {
 }
 
 void Particle::CreateBoundingBox() {
-  EndPoint* low_x = new EndPoint(this, current_position_.x() - radius_, true);
-  EndPoint* high_x = new EndPoint(this, current_position_.x() + radius_, false);
-  EndPoint* low_y = new EndPoint(this, current_position_.y() - radius_, true);
-  EndPoint* high_y = new EndPoint(this, current_position_.y() + radius_, false);
+  EndPoint* low_x = new EndPoint(this, current_position_.x() - 2 * radius_, true);
+  EndPoint* high_x = new EndPoint(this, current_position_.x() + 2 * radius_, false);
+  EndPoint* low_y = new EndPoint(this, current_position_.y() - 2 * radius_, true);
+  EndPoint* high_y = new EndPoint(this, current_position_.y() + 2 * radius_, false);
                       
   bounding_box_ = AxisAlignedBoundingBox(low_x, high_x, low_y, high_y);
 }
 
 void Particle::paint(juce::Graphics& g) {
   g.setColour(color_);
-  g.fillEllipse(0, 0, radius_ * 2, radius_ * 2);
+  g.fillEllipse(radius_, radius_, radius_ * 2, radius_ * 2);
+
+  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
 }
 
 void Particle::UpdatePosition() {
   current_position_ = initial_position_ + (velocity_ * time_);
-  setBounds((int) current_position_.x() - radius_,
-            (int) current_position_.y() - radius_,
-            radius_ * 2,
-            radius_ * 2);
+  setBounds((int) current_position_.x() - 2 * radius_,
+            (int) current_position_.y() - 2 * radius_,
+            radius_ * 4,
+            radius_ * 4);
   
-  bounding_box_.bounds_x.first->value = current_position_.x() - radius_;
-  bounding_box_.bounds_x.second->value = current_position_.x() + radius_;
-  bounding_box_.bounds_y.first->value = current_position_.y() - radius_;
-  bounding_box_.bounds_y.second->value = current_position_.y() + radius_;
+  bounding_box_.bounds_x.first->value = current_position_.x() - 2 * radius_;
+  bounding_box_.bounds_x.second->value = current_position_.x() + 2 * radius_;
+  bounding_box_.bounds_y.first->value = current_position_.y() - 2 * radius_;
+  bounding_box_.bounds_y.second->value = current_position_.y() + 2 * radius_;
   
   ++time_;
 }
