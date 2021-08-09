@@ -13,6 +13,11 @@
 SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+#ifdef TEST_PLUGIN
+  CustomUnitTestRunner runner;
+  runner.runAllTests();
+#endif
+
   setSize (400, 300);
   setResizable(true, true);
   setResizeLimits(400, 300, 3200, 2400);

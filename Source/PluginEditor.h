@@ -13,6 +13,11 @@
 #include "ParticleManager.h"
 #include "Particle.h"
 
+#ifdef TEST_PLUGIN
+  #include "CustomUnitTestRunner.h"
+  #include "tests.h"
+#endif
+
 //==============================================================================
 /**
 */

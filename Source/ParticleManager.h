@@ -19,6 +19,9 @@ namespace synchrony {
 class Particle;
 
 class ParticleManager: public juce::AnimatedAppComponent {
+#ifdef TEST_PLUGIN
+  friend class TestParticleManager;
+#endif
 public:
   ParticleManager(SynchronyAudioProcessor& ap) : audio_processor_(ap) {
     setFramesPerSecond(60);
