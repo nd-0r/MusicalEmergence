@@ -18,9 +18,9 @@ class Particle: public juce::Component {
 public:
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
-           int radius,
-           float mass,
-           const juce::Colour& color);
+           int radius=4,
+           float mass=10,
+           const juce::Colour& color=juce::Colour(255, 255, 255));
   Particle(const Particle& other);
   ~Particle() override;
   void CreateBoundingBox();

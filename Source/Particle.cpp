@@ -11,9 +11,9 @@ namespace synchrony {
 
 Particle::Particle(const juce::Point<float>& init_pos,
                    const juce::Point<float>& init_vel,
-                   int radius=1,
-                   float mass=10,
-                   const juce::Colour& color=juce::Colour(255, 255, 255)) :
+                   int radius,
+                   float mass,
+                   const juce::Colour& color) :
                     mass_(mass),
                     radius_(radius),
                     color_(color) {
