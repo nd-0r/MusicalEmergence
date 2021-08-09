@@ -32,13 +32,14 @@ public:
   void RemoveParticle(const Particle& particle_to_remove);
   
 private:
-  void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis);
+  void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis);
 
   static void InsertSorted(std::vector<EndPoint*>& end_points,
                            const std::pair<EndPoint*, EndPoint*>& bounds,
                            size_t start_idx = 0);
 
-  bool overlap_matrix_[MAX_PARTICLES][MAX_PARTICLES];
+  bool overlap_matrix_[2][MAX_PARTICLES][MAX_PARTICLES];
+  int current_particle_id_ = 0;
   std::vector<std::unique_ptr<Particle>> particles_;
   std::vector<EndPoint*> positions_x_;
   std::vector<EndPoint*> positions_y_;

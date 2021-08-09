@@ -10,7 +10,7 @@
 namespace synchrony {
 
 void ParticleManager::AddParticle(Particle& new_particle) {
-  new_particle.SetId(static_cast<int>(particles_.size()));
+  new_particle.SetId(current_particle_id_++);
   particles_.push_back(std::make_unique<Particle>(new_particle));
   
   addAndMakeVisible(particles_.back().get());
@@ -50,11 +50,17 @@ void ParticleManager::update() {
 
 void ParticleManager::paint(juce::Graphics& g) {
   g.fillAll(juce::Colours::black);
+  
+  // TODO - remove
+  for (auto& pair : collision_candidate_pairs_) {
+    g.setColour(juce::Colours::white);
+    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
+  }
 }
 
 void ParticleManager::FindCollisions() {
-  SortAxisAndFindCandidates(positions_x_);
-  SortAxisAndFindCandidates(positions_y_);
+  SortAxisAndFindCandidates(positions_x_, true);
+  SortAxisAndFindCandidates(positions_y_, false);
 }
 
 void ParticleManager::ResolveCollisions() {
@@ -77,7 +83,8 @@ void ParticleManager::ResolveCollisions() {
       p2->SetVelocity(vel2_new);
     }
     
-    if (!overlap_matrix_[p1->GetId()][p2->GetId()]) {
+    if (!(overlap_matrix_[0][p1->GetId()][p2->GetId()] &&
+          overlap_matrix_[1][p1->GetId()][p2->GetId()])) {
       // particles no longer in striking range
       collision_candidate_pairs_.erase(iter++);
       ++idx;
@@ -92,7 +99,7 @@ void ParticleManager::ResolveCollisions() {
 //
 //}
 
-void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis) {
+void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis) {
   for (size_t key_idx = 1; key_idx < axis.size(); ++key_idx) {
     EndPoint* key = axis.at(key_idx);
     
@@ -104,22 +111,29 @@ void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis) {
       int swapper_id = to_swap->owner->GetId();
 
       if (key->owner != to_swap->owner) {
-        if (key->is_min) {
+        if (!to_swap->is_min && key->is_min) {
           // upper bound moves ahead or a lower bound or
           // lower bound moves ahead of lower bound
-          if (!(overlap_matrix_[key_id][swapper_id])) {
-            // these particle bounds haven't overlapped yet
-            overlap_matrix_[key_id][swapper_id] = true;
+          if (is_x_axis) {
+            overlap_matrix_[0][key_id][swapper_id] = true;
           } else {
-            // particle bounds overlapped on the other axis
+            overlap_matrix_[1][key_id][swapper_id] = true;
+          }
+          
+          if (overlap_matrix_[0][key_id][swapper_id] &&
+              overlap_matrix_[1][key_id][swapper_id]) {
             collision_candidate_pairs_.push_back(
                 std::pair<Particle*, Particle*>(key->owner, to_swap->owner));
           }
         }
         
-        if (!key->is_min && to_swap->is_min) {
+        if (to_swap->is_min && !key->is_min) {
           // lower bound moves ahead of upper bound
-          overlap_matrix_[key_id][swapper_id] = false;
+          if (is_x_axis) {
+            overlap_matrix_[0][key_id][swapper_id] = false;
+          } else {
+            overlap_matrix_[1][key_id][swapper_id] = false;
+          }
         }
       }
 
