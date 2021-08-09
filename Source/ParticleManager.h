@@ -14,13 +14,17 @@
 #include "Particle.h"
 #include "Utilities.h"
 
+#ifdef TEST_PLUGIN
+  class TestParticleManager;
+#endif
+
 namespace synchrony {
 
 class Particle;
 
 class ParticleManager: public juce::AnimatedAppComponent {
 #ifdef TEST_PLUGIN
-  friend class TestParticleManager;
+  friend TestParticleManager;
 #endif
 public:
   ParticleManager(SynchronyAudioProcessor& ap) : audio_processor_(ap) {

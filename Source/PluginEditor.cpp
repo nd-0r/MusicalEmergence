@@ -14,6 +14,7 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
 #ifdef TEST_PLUGIN
+  static TestParticleManager test; // So UnitTestRunner can run the tests
   CustomUnitTestRunner runner;
   runner.runAllTests();
 #endif
