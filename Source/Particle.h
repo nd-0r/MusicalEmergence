@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <stdio.h>
 #include <JuceHeader.h>
 #include <vector.hpp>
 #include "ParticleManager.h"

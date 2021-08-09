@@ -33,6 +33,7 @@ public:
   void FindCollisions();
   void ResolveCollisions();
   void RemoveParticle(const Particle& particle_to_remove);
+  void Reset();
   
 private:
   void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis);

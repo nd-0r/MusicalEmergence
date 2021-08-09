@@ -99,6 +99,15 @@ void ParticleManager::ResolveCollisions() {
 //
 //}
 
+void ParticleManager::Reset() {
+  memset(overlap_matrix_, 0, sizeof(overlap_matrix_));
+  current_particle_id_ = 0;
+  particles_.clear();
+  positions_x_.clear();
+  positions_y_.clear();
+  collision_candidate_pairs_.clear();
+}
+
 void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis) {
   for (size_t key_idx = 1; key_idx < axis.size(); ++key_idx) {
     EndPoint* key = axis.at(key_idx);
