@@ -10,46 +10,76 @@
 namespace synchrony {
 
 void ParticleManager::AddParticle(Particle& new_particle) {
-  new_particle.SetId(current_particle_id_++);
-  particles_.push_back(std::make_unique<Particle>(new_particle));
-  
-  addAndMakeVisible(particles_.back().get());
-  AxisAlignedBoundingBox* new_particle_box = particles_.back()->GetBoundingBox();
-  positions_x_.push_back(new_particle_box->bounds_x.first);
-  positions_x_.push_back(new_particle_box->bounds_x.second);
-  positions_y_.push_back(new_particle_box->bounds_y.first);
-  positions_y_.push_back(new_particle_box->bounds_y.second);
-//  InsertSorted(positions_x_, new_particle_box->bounds_x);
-//  InsertSorted(positions_y_, new_particle_box->bounds_y);
+  if (!paused_) {
+    new_particle.SetId(current_particle_id_++);
+    particles_.push_back(std::make_unique<Particle>(new_particle));
+    
+    addAndMakeVisible(particles_.back().get());
+    AxisAlignedBoundingBox* new_particle_box = particles_.back()->GetBoundingBox();
+    positions_x_.push_back(new_particle_box->bounds_x.first);
+    positions_x_.push_back(new_particle_box->bounds_x.second);
+    positions_y_.push_back(new_particle_box->bounds_y.first);
+    positions_y_.push_back(new_particle_box->bounds_y.second);
+  }
 }
 
 void ParticleManager::update() {
-  for (auto& particle : particles_) {
-    particle->UpdatePosition();
+  auto iter = particles_.begin();
+  while (iter != particles_.end()) {
+    auto& particle = *iter;
     
-    // Keep particles in bounds
-    float x_vel = particle->GetVelocity().x();
-    float y_vel = particle->GetVelocity().y();
-    
-    if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
-        (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
-      y_vel *= -1;
-      particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+    if (particle->IsRemoved()) {
+      particle->UpdatePosition();
+      removeChildComponent(particle.get());
+      for (size_t p_idx = 0; p_idx < particles_.size(); ++p_idx) {
+        SetOverlapMatrix(true, particle->GetId(), p_idx, false);
+        SetOverlapMatrix(false, particle->GetId(), p_idx, false);
+      }
+      FindCollisions();
+      if (!collision_candidate_pairs_.empty()) {
+        ResolveCollisions();
+      }
+      positions_x_.pop_back();
+      positions_x_.pop_back();
+      positions_y_.pop_back();
+      positions_y_.pop_back();
+      particles_.erase(iter++);
+      continue;
     }
     
-    if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
-        (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
-      x_vel *= -1;
-      particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+    if (!paused_) {
+      particle->UpdatePosition();
+      
+      // Keep particles in bounds
+      float x_vel = particle->GetVelocity().x();
+      float y_vel = particle->GetVelocity().y();
+      
+      if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
+          (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
+        y_vel *= -1;
+        particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+      }
+      
+      if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
+          (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
+        x_vel *= -1;
+        particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+      }
     }
+
+    ++iter;
   }
   
-  if (particles_.size() > 1) {
+  if (particles_.size() > 1 && !paused_) {
     FindCollisions();
     if (!collision_candidate_pairs_.empty()) {
       ResolveCollisions();
     }
   }
+}
+
+void ParticleManager::TogglePause() {
+  paused_ = !paused_;
 }
 
 void ParticleManager::paint(juce::Graphics& g) {
@@ -78,6 +108,14 @@ void ParticleManager::ResolveCollisions() {
     Particle* p1 = (*iter).first;
     Particle* p2 = (*iter).second;
     
+    if (!(GetOverlapMatrix(false, p1->GetId(), p2->GetId()) &&
+          GetOverlapMatrix(true, p1->GetId(), p2->GetId()))) {
+      // particles no longer in striking range
+      collision_candidate_pairs_.erase(iter++);
+      ++idx;
+      continue;
+    }
+    
     // Handle collision between particles
     if (Particle::DoParticlesCollide(p1, p2)) {
       vmml::Vector2f vel1_new = Particle::CalcCollisionVelocity(p1, p2);
@@ -87,13 +125,6 @@ void ParticleManager::ResolveCollisions() {
       p2->SetVelocity(vel2_new);
     }
     
-    if (!(GetOverlapMatrix(false, p1->GetId(), p2->GetId()) &&
-          GetOverlapMatrix(true, p1->GetId(), p2->GetId()))) {
-      // particles no longer in striking range
-      collision_candidate_pairs_.erase(iter++);
-      ++idx;
-      continue;
-    }
     ++idx;
     ++iter;
   }

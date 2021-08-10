@@ -55,19 +55,33 @@ void Particle::paint(juce::Graphics& g) {
 //  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
 }
 
-void Particle::UpdatePosition() {
-  ++time_;
+void Particle::mouseDown(const juce::MouseEvent& event) {
+  if (event.eventComponent == this) {
+    removed_ = true;
+  }
+}
 
-  current_position_ = initial_position_ + (velocity_ * time_);
-  setBounds((int) current_position_.x() - 2 * radius_,
-            (int) current_position_.y() - 2 * radius_,
-            radius_ * 4,
-            radius_ * 4);
-  
-  bounding_box_.bounds_x.first->value = current_position_.x() - 2 * radius_;
-  bounding_box_.bounds_x.second->value = current_position_.x() + 2 * radius_;
-  bounding_box_.bounds_y.first->value = current_position_.y() - 2 * radius_;
-  bounding_box_.bounds_y.second->value = current_position_.y() + 2 * radius_;
+void Particle::UpdatePosition() {
+  if (!removed_) {
+    ++time_;
+
+    current_position_ = initial_position_ + (velocity_ * time_);
+    setBounds((int) current_position_.x() - 2 * radius_,
+              (int) current_position_.y() - 2 * radius_,
+              radius_ * 4,
+              radius_ * 4);
+    
+    bounding_box_.bounds_x.first->value = current_position_.x() - 2 * radius_;
+    bounding_box_.bounds_x.second->value = current_position_.x() + 2 * radius_;
+    bounding_box_.bounds_y.first->value = current_position_.y() - 2 * radius_;
+    bounding_box_.bounds_y.second->value = current_position_.y() + 2 * radius_;
+  } else {
+    // Move the bounds to the end of each axis so they can be easily popped
+    bounding_box_.bounds_x.first->value = std::numeric_limits<float>::max();
+    bounding_box_.bounds_x.second->value = std::numeric_limits<float>::max();
+    bounding_box_.bounds_y.first->value = std::numeric_limits<float>::max();
+    bounding_box_.bounds_y.second->value = std::numeric_limits<float>::max();
+  }
 }
 
 void Particle::SetId(size_t to_id) {
@@ -153,6 +167,10 @@ const juce::Colour& Particle::GetColor() const {
 
 AxisAlignedBoundingBox* Particle::GetBoundingBox() {
   return &bounding_box_;
+}
+
+bool Particle::IsRemoved() const {
+  return removed_;
 }
 
 bool Particle::AreParticlesApproaching(const Particle* particle1,

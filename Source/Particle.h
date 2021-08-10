@@ -26,6 +26,7 @@ public:
   void CreateBoundingBox();
   
   void paint(juce::Graphics& g) override;
+  void mouseDown(const juce::MouseEvent& event) override;
   void UpdatePosition();
   void SetId(size_t to_id);
   void SetVelocity(vmml::Vector2f new_velocity);
@@ -42,6 +43,7 @@ public:
   float GetMass() const;
   const juce::Colour& GetColor() const;
   AxisAlignedBoundingBox* GetBoundingBox();
+  bool IsRemoved() const;
   
   static bool DoParticlesCollide(const Particle* particle1,
                                  const Particle* particle2);
@@ -63,6 +65,7 @@ private:
   vmml::Vector2f velocity_;
   float mass_;
   int radius_;
+  bool removed_ = false;
   EndPoint low_x_;
   EndPoint high_x_;
   EndPoint low_y_;

@@ -26,6 +26,9 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   addAndMakeVisible(add_particle_);
   add_particle_.addListener(this);
   
+  addAndMakeVisible(pause_);
+  pause_.addListener(this);
+  
   addAndMakeVisible(particle_speed_label_);
   particle_speed_label_.setColour(juce::Label::ColourIds::textColourId,
                                   getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
@@ -80,6 +83,13 @@ void SynchronyAudioProcessorEditor::resized()
   add_particle_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                         kAddParticleBtnHeight);
   
+  pause_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                            static_cast<int>(height * kMargin +
+                                             kAddParticleBtnHeight +
+                                             kSettingsSpacer));
+  pause_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+                 kAddParticleBtnHeight);
+  
   clock_speed_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
                                         static_cast<int>(0.3 * height));
   clock_speed_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
@@ -120,6 +130,8 @@ void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
                                                      10,
                                                      juce::Colours::white);
     pm_.AddParticle(to_add);
+  } else if (button == &pause_) {
+    pm_.TogglePause();
   }
 }
 

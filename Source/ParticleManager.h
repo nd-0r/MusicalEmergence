@@ -35,6 +35,7 @@ public:
   
   void AddParticle(Particle& new_particle);
   void update() override;
+  void TogglePause();
   void paint(juce::Graphics& g) override;
   void FindCollisions();
   void ResolveCollisions();
@@ -50,10 +51,12 @@ private:
 
   std::unique_ptr<OverlapMatrix> overlap_matrix_{new OverlapMatrix};
   size_t current_particle_id_ = 0;
-  std::vector<std::unique_ptr<Particle>> particles_;
+  std::list<std::unique_ptr<Particle>> particles_;
   std::vector<EndPoint*> positions_x_;
   std::vector<EndPoint*> positions_y_;
   std::list<std::pair<Particle*, Particle*>> collision_candidate_pairs_;
+  
+  bool paused_;
   
   SynchronyAudioProcessor& audio_processor_;
   
