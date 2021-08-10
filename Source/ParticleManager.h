@@ -22,6 +22,8 @@ namespace synchrony {
 
 class Particle;
 
+typedef std::array<std::array<bool, MAX_PARTICLES * (MAX_PARTICLES + 1) / 2>, 2> OverlapMatrix;
+
 class ParticleManager: public juce::AnimatedAppComponent {
 #ifdef TEST_PLUGIN
   friend TestParticleManager;
@@ -42,12 +44,16 @@ public:
 private:
   void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis);
 
+  void SetOverlapMatrix(bool is_x_axis, size_t i, size_t j, bool value);
+
+  bool GetOverlapMatrix(bool is_x_axis, size_t i, size_t j) const;
+
   static void InsertSorted(std::vector<EndPoint*>& end_points,
                            const std::pair<EndPoint*, EndPoint*>& bounds,
                            size_t start_idx = 0);
 
-  bool overlap_matrix_[2][MAX_PARTICLES][MAX_PARTICLES];
-  int current_particle_id_ = 0;
+  std::unique_ptr<OverlapMatrix> overlap_matrix_{new OverlapMatrix};
+  size_t current_particle_id_ = 0;
   std::vector<std::unique_ptr<Particle>> particles_;
   std::vector<EndPoint*> positions_x_;
   std::vector<EndPoint*> positions_y_;

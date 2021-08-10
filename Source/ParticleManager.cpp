@@ -83,8 +83,8 @@ void ParticleManager::ResolveCollisions() {
       p2->SetVelocity(vel2_new);
     }
     
-    if (!(overlap_matrix_[0][p1->GetId()][p2->GetId()] &&
-          overlap_matrix_[1][p1->GetId()][p2->GetId()])) {
+    if (!(GetOverlapMatrix(false, p1->GetId(), p2->GetId()) &&
+          GetOverlapMatrix(true, p1->GetId(), p2->GetId()))) {
       // particles no longer in striking range
       collision_candidate_pairs_.erase(iter++);
       ++idx;
@@ -100,7 +100,7 @@ void ParticleManager::ResolveCollisions() {
 //}
 
 void ParticleManager::Reset() {
-  memset(overlap_matrix_, 0, sizeof(overlap_matrix_));
+  overlap_matrix_ = std::unique_ptr<OverlapMatrix>(new OverlapMatrix());
   current_particle_id_ = 0;
   particles_.clear();
   positions_x_.clear();
@@ -114,35 +114,26 @@ void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bo
     
     size_t swapper_idx = key_idx;
     while (swapper_idx > 0 &&
-           axis[swapper_idx - 1]->GetValue() > axis[swapper_idx]->GetValue()) {
+           axis[swapper_idx - 1]->GetValue() >= axis[swapper_idx]->GetValue()) {
       EndPoint* to_swap = axis[swapper_idx - 1];
-      int key_id = key->owner->GetId();
-      int swapper_id = to_swap->owner->GetId();
+      size_t key_id = key->owner->GetId();
+      size_t swapper_id = to_swap->owner->GetId();
 
       if (key->owner != to_swap->owner) {
         if (!to_swap->is_min && key->is_min) {
-          // upper bound moves ahead or a lower bound or
-          // lower bound moves ahead of lower bound
-          if (is_x_axis) {
-            overlap_matrix_[0][key_id][swapper_id] = true;
-          } else {
-            overlap_matrix_[1][key_id][swapper_id] = true;
-          }
+          // upper bound moves ahead of a lower bound
+          SetOverlapMatrix(is_x_axis, key_id, swapper_id, true);
           
-          if (overlap_matrix_[0][key_id][swapper_id] &&
-              overlap_matrix_[1][key_id][swapper_id]) {
+          if (GetOverlapMatrix(false, key_id, swapper_id) &&
+              GetOverlapMatrix(true, key_id, swapper_id)) {
             collision_candidate_pairs_.push_back(
                 std::pair<Particle*, Particle*>(key->owner, to_swap->owner));
           }
         }
         
         if (to_swap->is_min && !key->is_min) {
-          // lower bound moves ahead of upper bound
-          if (is_x_axis) {
-            overlap_matrix_[0][key_id][swapper_id] = false;
-          } else {
-            overlap_matrix_[1][key_id][swapper_id] = false;
-          }
+          // lower bound moves ahead of an upper bound
+          SetOverlapMatrix(is_x_axis, key_id, swapper_id, false);
         }
       }
 
@@ -150,6 +141,38 @@ void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bo
       axis[swapper_idx] = to_swap;
       
       --swapper_idx;
+    }
+  }
+}
+
+void ParticleManager::SetOverlapMatrix(bool is_x_axis, size_t i, size_t j, bool value) {
+  if (is_x_axis) {
+    if (i > j) {
+      overlap_matrix_->at(0)[MAX_PARTICLES * j + i] = value;
+    } else {
+      overlap_matrix_->at(0)[MAX_PARTICLES * i + j] = value;
+    }
+  } else {
+    if (i > j) {
+      overlap_matrix_->at(1)[MAX_PARTICLES * j + i] = value;
+    } else {
+      overlap_matrix_->at(1)[MAX_PARTICLES * i + j] = value;
+    }
+  }
+}
+
+bool ParticleManager::GetOverlapMatrix(bool is_x_axis, size_t i, size_t j) const {
+  if (is_x_axis) {
+    if (i > j) {
+      return overlap_matrix_->at(0)[MAX_PARTICLES * j + i];
+    } else {
+      return overlap_matrix_->at(0)[MAX_PARTICLES * i + j];
+    }
+  } else {
+    if (i > j) {
+      return overlap_matrix_->at(1)[MAX_PARTICLES * j + i];
+    } else {
+      return overlap_matrix_->at(1)[MAX_PARTICLES * i + j];
     }
   }
 }
