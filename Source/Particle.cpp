@@ -40,22 +40,24 @@ Particle::~Particle() {
 }
 
 void Particle::CreateBoundingBox() {
-  EndPoint* low_x = new EndPoint(this, current_position_.x() - 2 * radius_, true);
-  EndPoint* high_x = new EndPoint(this, current_position_.x() + 2 * radius_, false);
-  EndPoint* low_y = new EndPoint(this, current_position_.y() - 2 * radius_, true);
-  EndPoint* high_y = new EndPoint(this, current_position_.y() + 2 * radius_, false);
+  low_x_ = EndPoint(this, current_position_.x() - 2 * radius_, true);
+  high_x_ = EndPoint(this, current_position_.x() + 2 * radius_, false);
+  low_y_ = EndPoint(this, current_position_.y() - 2 * radius_, true);
+  high_y_ = EndPoint(this, current_position_.y() + 2 * radius_, false);
                       
-  bounding_box_ = AxisAlignedBoundingBox(low_x, high_x, low_y, high_y);
+  bounding_box_ = AxisAlignedBoundingBox(&low_x_, &high_x_, &low_y_, &high_y_);
 }
 
 void Particle::paint(juce::Graphics& g) {
   g.setColour(color_);
   g.fillEllipse(radius_, radius_, radius_ * 2, radius_ * 2);
 
-  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
+//  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
 }
 
 void Particle::UpdatePosition() {
+  ++time_;
+
   current_position_ = initial_position_ + (velocity_ * time_);
   setBounds((int) current_position_.x() - 2 * radius_,
             (int) current_position_.y() - 2 * radius_,
@@ -66,11 +68,9 @@ void Particle::UpdatePosition() {
   bounding_box_.bounds_x.second->value = current_position_.x() + 2 * radius_;
   bounding_box_.bounds_y.first->value = current_position_.y() - 2 * radius_;
   bounding_box_.bounds_y.second->value = current_position_.y() + 2 * radius_;
-  
-  ++time_;
 }
 
-void Particle::SetId(int to_id) {
+void Particle::SetId(size_t to_id) {
   id_ = to_id;
 }
 
@@ -114,6 +114,7 @@ vmml::Vector2f Particle::CalcCollisionVelocity(const Particle* particle1,
 
 bool Particle::operator==(const Particle& other_particle) const {
   return initial_position_ == other_particle.initial_position_ &&
+         current_position_ == other_particle.current_position_ &&
          radius_ == other_particle.radius_ &&
          color_ == other_particle.color_;
 }
@@ -122,7 +123,7 @@ bool Particle::operator!=(const Particle& other_particle) const {
   return !operator==(other_particle);
 }
 
-int Particle::GetId() const {
+size_t Particle::GetId() const {
   return id_;
 }
 

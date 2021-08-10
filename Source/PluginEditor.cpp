@@ -115,7 +115,7 @@ void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
   // TODO - implement
   if (button == &add_particle_) {
     synchrony::Particle to_add = synchrony::Particle(juce::Point<float>(32, 56),
-                                                     juce::Point<float>(1, 1),
+                                                     juce::Point<float>(2, 2),
                                                      10,
                                                      10,
                                                      juce::Colours::white);

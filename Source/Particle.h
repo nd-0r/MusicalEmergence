@@ -27,14 +27,14 @@ public:
   
   void paint(juce::Graphics& g) override;
   void UpdatePosition();
-  void SetId(int to_id);
+  void SetId(size_t to_id);
   void SetVelocity(vmml::Vector2f new_velocity);
   
   bool operator==(const Particle& other_particle) const;
   
   bool operator!=(const Particle& other_particle) const;
   
-  int GetId() const;
+  size_t GetId() const;
   const vmml::Vector2f& GetInitialPosition() const;
   const vmml::Vector2f& GetCurrentPosition() const;
   const vmml::Vector2f& GetVelocity() const;
@@ -56,13 +56,17 @@ private:
   static bool AreParticlesApproaching(const Particle* particle1,
                                       const Particle* particle2);
   
-  int id_;
+  size_t id_;
   unsigned int time_ = 0;
   vmml::Vector2f initial_position_;
   vmml::Vector2f current_position_;
   vmml::Vector2f velocity_;
   float mass_;
   int radius_;
+  EndPoint low_x_;
+  EndPoint high_x_;
+  EndPoint low_y_;
+  EndPoint high_y_;
   AxisAlignedBoundingBox bounding_box_;
   juce::Colour color_;
 };
