@@ -15,8 +15,12 @@ void ParticleManager::AddParticle(Particle& new_particle) {
   
   addAndMakeVisible(particles_.back().get());
   AxisAlignedBoundingBox* new_particle_box = particles_.back()->GetBoundingBox();
-  InsertSorted(positions_x_, new_particle_box->bounds_x);
-  InsertSorted(positions_y_, new_particle_box->bounds_y);
+  positions_x_.push_back(new_particle_box->bounds_x.first);
+  positions_x_.push_back(new_particle_box->bounds_x.second);
+  positions_y_.push_back(new_particle_box->bounds_y.first);
+  positions_y_.push_back(new_particle_box->bounds_y.second);
+//  InsertSorted(positions_x_, new_particle_box->bounds_x);
+//  InsertSorted(positions_y_, new_particle_box->bounds_y);
 }
 
 void ParticleManager::update() {
@@ -51,11 +55,11 @@ void ParticleManager::update() {
 void ParticleManager::paint(juce::Graphics& g) {
   g.fillAll(juce::Colours::black);
   
-  // TODO - remove
-  for (auto& pair : collision_candidate_pairs_) {
-    g.setColour(juce::Colours::white);
-    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
-  }
+//  // TODO - remove
+//  for (auto& pair : collision_candidate_pairs_) {
+//    g.setColour(juce::Colours::white);
+//    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
+//  }
 }
 
 void ParticleManager::FindCollisions() {
@@ -174,34 +178,6 @@ bool ParticleManager::GetOverlapMatrix(bool is_x_axis, size_t i, size_t j) const
     } else {
       return overlap_matrix_->at(1)[MAX_PARTICLES * i + j];
     }
-  }
-}
-
-void ParticleManager::InsertSorted(std::vector<EndPoint*>& end_points,
-                                   const std::pair<EndPoint*, EndPoint*>& bounds,
-                                   size_t start_idx) {
-  EndPoint* point_to_insert = (start_idx == 0) ? bounds.first : bounds.second;
-  
-  std::vector<EndPoint*>::iterator iter;
-  size_t idx = start_idx;
-  for (iter = end_points.begin() + static_cast<long>(start_idx);
-       iter != end_points.end();
-       ++iter, ++idx) {
-    if (point_to_insert->GetValue() < (*iter)->GetValue()) {
-      end_points.insert(iter, point_to_insert);
-      
-      if (start_idx == 0) {
-        InsertSorted(end_points, bounds, idx + 1);
-      }
-      
-      return;
-    }
-  }
-  
-  end_points.push_back(point_to_insert);
-  
-  if (start_idx == 0) {
-    InsertSorted(end_points, bounds, 1);
   }
 }
 

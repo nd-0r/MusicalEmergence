@@ -48,10 +48,6 @@ private:
 
   bool GetOverlapMatrix(bool is_x_axis, size_t i, size_t j) const;
 
-  static void InsertSorted(std::vector<EndPoint*>& end_points,
-                           const std::pair<EndPoint*, EndPoint*>& bounds,
-                           size_t start_idx = 0);
-
   std::unique_ptr<OverlapMatrix> overlap_matrix_{new OverlapMatrix};
   size_t current_particle_id_ = 0;
   std::vector<std::unique_ptr<Particle>> particles_;
