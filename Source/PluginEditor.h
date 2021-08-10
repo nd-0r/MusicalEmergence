@@ -15,7 +15,7 @@
 
 #ifdef TEST_PLUGIN
   #include "CustomUnitTestRunner.h"
-  #include "tests.h"
+  #include "TestParticleManager.h"
 #endif
 
 //==============================================================================

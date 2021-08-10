@@ -32,18 +32,27 @@ public:
   ParticleManager(SynchronyAudioProcessor& ap) : audio_processor_(ap) {
     setFramesPerSecond(60);
   }
-  
+
   void AddParticle(Particle& new_particle);
+
   void update() override;
+
   void TogglePause();
-  void paint(juce::Graphics& g) override;
-  void FindCollisions();
-  void ResolveCollisions();
-  void RemoveParticle(const Particle& particle_to_remove);
+
   void Reset();
-  
+
+  void paint(juce::Graphics& g) override;
+
 private:
+  void ExecuteWallCollisions(std::unique_ptr<Particle>& particle);
+
+  void FindCollisions();
+
+  void ResolveCollisions();
+
   void SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis);
+  
+  void RemoveParticle(std::unique_ptr<Particle>& particle);
 
   void SetOverlapMatrix(bool is_x_axis, size_t i, size_t j, bool value);
 

@@ -8,7 +8,8 @@
       <GROUP id="{57AC3864-8276-546B-695B-C2BACDDE7B8A}" name="Test">
         <FILE id="k9LByz" name="CustomUnitTestRunner.h" compile="0" resource="0"
               file="Source/CustomUnitTestRunner.h"/>
-        <FILE id="kf6DX6" name="tests.h" compile="1" resource="0" file="Source/tests.h"/>
+        <FILE id="kf6DX6" name="TestParticleManager.h" compile="1" resource="0"
+              file="Source/TestParticleManager.h"/>
       </GROUP>
       <GROUP id="{0215D8C2-5F11-5356-72FC-3EB4EB6E6355}" name="Core">
         <FILE id="yCbtqG" name="Particle.cpp" compile="1" resource="0" file="Source/Particle.cpp"/>

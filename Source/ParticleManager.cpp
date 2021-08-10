@@ -29,42 +29,14 @@ void ParticleManager::update() {
     auto& particle = *iter;
     
     if (particle->IsRemoved()) {
-      particle->UpdatePosition();
-      removeChildComponent(particle.get());
-      for (size_t p_idx = 0; p_idx < particles_.size(); ++p_idx) {
-        SetOverlapMatrix(true, particle->GetId(), p_idx, false);
-        SetOverlapMatrix(false, particle->GetId(), p_idx, false);
-      }
-      FindCollisions();
-      if (!collision_candidate_pairs_.empty()) {
-        ResolveCollisions();
-      }
-      positions_x_.pop_back();
-      positions_x_.pop_back();
-      positions_y_.pop_back();
-      positions_y_.pop_back();
+      RemoveParticle(particle);
       particles_.erase(iter++);
       continue;
     }
     
     if (!paused_) {
       particle->UpdatePosition();
-      
-      // Keep particles in bounds
-      float x_vel = particle->GetVelocity().x();
-      float y_vel = particle->GetVelocity().y();
-      
-      if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
-          (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
-        y_vel *= -1;
-        particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
-      }
-      
-      if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
-          (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
-        x_vel *= -1;
-        particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
-      }
+      ExecuteWallCollisions(particle);
     }
 
     ++iter;
@@ -82,6 +54,15 @@ void ParticleManager::TogglePause() {
   paused_ = !paused_;
 }
 
+void ParticleManager::Reset() {
+  overlap_matrix_ = std::unique_ptr<OverlapMatrix>(new OverlapMatrix());
+  current_particle_id_ = 0;
+  particles_.clear();
+  positions_x_.clear();
+  positions_y_.clear();
+  collision_candidate_pairs_.clear();
+}
+
 void ParticleManager::paint(juce::Graphics& g) {
   g.fillAll(juce::Colours::black);
   
@@ -90,6 +71,24 @@ void ParticleManager::paint(juce::Graphics& g) {
 //    g.setColour(juce::Colours::white);
 //    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
 //  }
+}
+
+void ParticleManager::ExecuteWallCollisions(std::unique_ptr<Particle>& particle) {
+  // Keep particles in bounds
+  float x_vel = particle->GetVelocity().x();
+  float y_vel = particle->GetVelocity().y();
+
+  if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
+      (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
+    y_vel *= -1;
+    particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+  }
+
+  if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
+      (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
+    x_vel *= -1;
+    particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+  }
 }
 
 void ParticleManager::FindCollisions() {
@@ -130,19 +129,6 @@ void ParticleManager::ResolveCollisions() {
   }
 }
 
-//void ParticleManager::RemoveParticle(const Particle& particle_to_remove) {
-//
-//}
-
-void ParticleManager::Reset() {
-  overlap_matrix_ = std::unique_ptr<OverlapMatrix>(new OverlapMatrix());
-  current_particle_id_ = 0;
-  particles_.clear();
-  positions_x_.clear();
-  positions_y_.clear();
-  collision_candidate_pairs_.clear();
-}
-
 void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bool is_x_axis) {
   for (size_t key_idx = 1; key_idx < axis.size(); ++key_idx) {
     EndPoint* key = axis.at(key_idx);
@@ -178,6 +164,23 @@ void ParticleManager::SortAxisAndFindCandidates(std::vector<EndPoint*>& axis, bo
       --swapper_idx;
     }
   }
+}
+
+void ParticleManager::RemoveParticle(std::unique_ptr<Particle>& particle) {
+  particle->UpdatePosition();
+  removeChildComponent(particle.get());
+  for (size_t p_idx = 0; p_idx < particles_.size(); ++p_idx) {
+    SetOverlapMatrix(true, particle->GetId(), p_idx, false);
+    SetOverlapMatrix(false, particle->GetId(), p_idx, false);
+  }
+  FindCollisions();
+  if (!collision_candidate_pairs_.empty()) {
+    ResolveCollisions();
+  }
+  positions_x_.pop_back();
+  positions_x_.pop_back();
+  positions_y_.pop_back();
+  positions_y_.pop_back();
 }
 
 void ParticleManager::SetOverlapMatrix(bool is_x_axis, size_t i, size_t j, bool value) {
