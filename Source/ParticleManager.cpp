@@ -9,8 +9,8 @@
 
 namespace synchrony {
 
-void ParticleManager::AddParticle(Particle& new_particle) {
-  if (!paused_) {
+bool ParticleManager::AddParticle(Particle& new_particle) {
+  if (!paused_ && particles_.size() < MAX_PARTICLES) {
     new_particle.SetId(current_particle_id_++);
     particles_.push_back(std::make_unique<Particle>(new_particle));
     
@@ -20,7 +20,11 @@ void ParticleManager::AddParticle(Particle& new_particle) {
     positions_x_.push_back(new_particle_box->bounds_x.second);
     positions_y_.push_back(new_particle_box->bounds_y.first);
     positions_y_.push_back(new_particle_box->bounds_y.second);
+    
+    return true;
   }
+  
+  return false;
 }
 
 void ParticleManager::update() {
@@ -36,7 +40,6 @@ void ParticleManager::update() {
     
     if (!(paused_ || adding_particle_)) {
       particle->UpdatePosition();
-      ExecuteWallCollisions(particle);
     }
 
     ++iter;
@@ -53,11 +56,10 @@ void ParticleManager::update() {
 void ParticleManager::mouseDown(const juce::MouseEvent& event) {
   if (event.originalComponent == this &&
       event.getLengthOfMousePress() < 100) {
-    adding_particle_ = true;
     Particle to_add = Particle(event.getPosition(),
                                juce::Point<int>(1, 1),
                                10);
-    AddParticle(to_add);
+    adding_particle_ = AddParticle(to_add);
   }
 }
 
@@ -96,24 +98,6 @@ void ParticleManager::paint(juce::Graphics& g) {
 //    g.setColour(juce::Colours::white);
 //    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
 //  }
-}
-
-void ParticleManager::ExecuteWallCollisions(std::unique_ptr<Particle>& particle) {
-  // Keep particles in bounds
-  float x_vel = particle->GetVelocity().x();
-  float y_vel = particle->GetVelocity().y();
-
-  if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
-      (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
-    y_vel *= -1;
-    particle->SetVelocity(juce::Point<float>(x_vel, y_vel));
-  }
-
-  if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
-      (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
-    x_vel *= -1;
-    particle->SetVelocity(juce::Point<float>(x_vel, y_vel));
-  }
 }
 
 void ParticleManager::FindCollisions() {

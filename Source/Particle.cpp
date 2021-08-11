@@ -76,6 +76,7 @@ void Particle::mouseDown(const juce::MouseEvent& event) {
 }
 
 void Particle::UpdatePosition() {
+  KeepInBounds();
   if (!removed_) {
     ++time_;
 
@@ -192,6 +193,30 @@ AxisAlignedBoundingBox* Particle::GetBoundingBox() {
 
 bool Particle::IsRemoved() const {
   return removed_;
+}
+
+void Particle::KeepInBounds() {
+  if (current_position_.y() >= getParentHeight()) {
+    current_position_ = vmml::Vector2f(current_position_.x(),
+                                       getParentHeight() - radius_);
+    SetVelocity(velocity_);
+  }
+  
+  if (current_position_.x() >= getParentWidth()) {
+    current_position_ = vmml::Vector2f(getParentWidth() - radius_,
+                                       current_position_.y());
+    SetVelocity(velocity_);
+  }
+
+  if ((velocity_.y() < 0 && current_position_.y() - radius_ <= 0) ||
+      (velocity_.y() > 0 && current_position_.y() + radius_ >= getParentHeight())) {
+    SetVelocity(velocity_ * vmml::Vector2f(1, -1));
+  }
+
+  if ((velocity_.x() < 0 && current_position_.x() - radius_ < 0) ||
+      (velocity_.x() > 0 && current_position_.x() + radius_ > getParentWidth())) {
+    SetVelocity(velocity_ * vmml::Vector2f(-1, 1));
+  }
 }
 
 void Particle::SetVelocity(const vmml::Vector2f& new_velocity) {

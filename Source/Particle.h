@@ -56,6 +56,8 @@ public:
                                    Particle* particle2);
   
 private:
+  void KeepInBounds();
+
   void SetVelocity(const vmml::Vector2f& new_velocity);
   
   static bool AreParticlesApproaching(const Particle* particle1,

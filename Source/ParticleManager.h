@@ -33,7 +33,7 @@ public:
     setFramesPerSecond(60);
   }
 
-  void AddParticle(Particle& new_particle);
+  bool AddParticle(Particle& new_particle);
 
   void update() override;
   
@@ -48,8 +48,6 @@ public:
   void paint(juce::Graphics& g) override;
 
 private:
-  void ExecuteWallCollisions(std::unique_ptr<Particle>& particle);
-
   void FindCollisions();
 
   void ResolveCollisions();
