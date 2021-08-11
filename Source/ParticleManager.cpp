@@ -34,7 +34,7 @@ void ParticleManager::update() {
       continue;
     }
     
-    if (!paused_) {
+    if (!(paused_ || adding_particle_)) {
       particle->UpdatePosition();
       ExecuteWallCollisions(particle);
     }
@@ -42,12 +42,37 @@ void ParticleManager::update() {
     ++iter;
   }
   
-  if (particles_.size() > 1 && !paused_) {
+  if (particles_.size() > 1 && !paused_ && !adding_particle_) {
     FindCollisions();
     if (!collision_candidate_pairs_.empty()) {
       ResolveCollisions();
     }
   }
+}
+
+void ParticleManager::mouseDown(const juce::MouseEvent& event) {
+  if (event.originalComponent == this &&
+      event.getLengthOfMousePress() < 100) {
+    adding_particle_ = true;
+    Particle to_add = Particle(event.getPosition(),
+                               juce::Point<int>(1, 1),
+                               10);
+    AddParticle(to_add);
+  }
+}
+
+void ParticleManager::mouseUp(const juce::MouseEvent& event) {
+  if (event.originalComponent == this &&
+      adding_particle_ &&
+      event.getLengthOfMousePress() < 100) {
+    auto new_velocity = juce::Point<float>(1, 1);
+    particles_.back()->SetVelocity(new_velocity);
+  } else if (event.originalComponent == this &&
+             adding_particle_) {
+    auto new_velocity = event.getOffsetFromDragStart().toFloat() * 0.015;
+    particles_.back()->SetVelocity(new_velocity);
+  }
+  adding_particle_ = false;
 }
 
 void ParticleManager::TogglePause() {
@@ -81,13 +106,13 @@ void ParticleManager::ExecuteWallCollisions(std::unique_ptr<Particle>& particle)
   if ((y_vel < 0 && particle->GetCurrentPosition().y() - particle->GetRadius() <= 0) ||
       (y_vel > 0 && particle->GetCurrentPosition().y() + particle->GetRadius() >= getHeight())) {
     y_vel *= -1;
-    particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+    particle->SetVelocity(juce::Point<float>(x_vel, y_vel));
   }
 
   if ((x_vel < 0 && particle->GetCurrentPosition().x() - particle->GetRadius() < 0) ||
       (x_vel > 0 && particle->GetCurrentPosition().x() + particle->GetRadius() > getWidth())) {
     x_vel *= -1;
-    particle->SetVelocity(vmml::Vector2f(x_vel, y_vel));
+    particle->SetVelocity(juce::Point<float>(x_vel, y_vel));
   }
 }
 
@@ -117,11 +142,7 @@ void ParticleManager::ResolveCollisions() {
     
     // Handle collision between particles
     if (Particle::DoParticlesCollide(p1, p2)) {
-      vmml::Vector2f vel1_new = Particle::CalcCollisionVelocity(p1, p2);
-      vmml::Vector2f vel2_new = Particle::CalcCollisionVelocity(p2, p1);
-      
-      p1->SetVelocity(vel1_new);
-      p2->SetVelocity(vel2_new);
+      Particle::SetCollisionVelocity(p1, p2);
     }
     
     ++idx;

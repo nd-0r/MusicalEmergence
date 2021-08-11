@@ -16,6 +16,11 @@ namespace synchrony {
 
 class Particle: public juce::Component {
 public:
+  Particle(const juce::Point<int>& init_pos,
+           const juce::Point<int>& init_vel,
+           int radius=4,
+           const juce::Colour& color=juce::Colour(255, 255, 255));
+
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
            int radius=4,
@@ -29,7 +34,7 @@ public:
   void mouseDown(const juce::MouseEvent& event) override;
   void UpdatePosition();
   void SetId(size_t to_id);
-  void SetVelocity(vmml::Vector2f new_velocity);
+  void SetVelocity(const juce::Point<float>& new_velocity);
   
   bool operator==(const Particle& other_particle) const;
   
@@ -47,13 +52,11 @@ public:
   
   static bool DoParticlesCollide(const Particle* particle1,
                                  const Particle* particle2);
-  static vmml::Vector2f CalcCollisionVelocity(const Particle* particle1,
-                                              const Particle* particle2);
-  
-  bool is_collision_candidate = false;
+  static void SetCollisionVelocity(Particle* particle1,
+                                   Particle* particle2);
   
 private:
-  vmml::Vector2f CalculateCurrentPosition() const;
+  void SetVelocity(const vmml::Vector2f& new_velocity);
   
   static bool AreParticlesApproaching(const Particle* particle1,
                                       const Particle* particle2);

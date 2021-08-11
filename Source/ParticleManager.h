@@ -36,6 +36,10 @@ public:
   void AddParticle(Particle& new_particle);
 
   void update() override;
+  
+  void mouseDown(const juce::MouseEvent& event) override;
+  
+  void mouseUp(const juce::MouseEvent& event) override;
 
   void TogglePause();
 
@@ -64,9 +68,10 @@ private:
   std::vector<EndPoint*> positions_x_;
   std::vector<EndPoint*> positions_y_;
   std::list<std::pair<Particle*, Particle*>> collision_candidate_pairs_;
-  
-  bool paused_;
-  
+
+  bool paused_ = false;
+  bool adding_particle_ = false;
+
   SynchronyAudioProcessor& audio_processor_;
   
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParticleManager)

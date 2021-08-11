@@ -9,6 +9,20 @@
 
 namespace synchrony {
 
+Particle::Particle(const juce::Point<int>& init_pos,
+                   const juce::Point<int>& init_vel,
+                   int radius,
+                   const juce::Colour& color) :
+                    mass_(radius * 2),
+                    radius_(radius),
+                    color_(color) {
+  initial_position_ = vmml::Vector2f(static_cast<float>(init_pos.x),
+                                     static_cast<float>(init_pos.y));
+  current_position_ = initial_position_;
+  velocity_ = vmml::Vector2f(init_vel.x, init_vel.y);
+  CreateBoundingBox();
+}
+
 Particle::Particle(const juce::Point<float>& init_pos,
                    const juce::Point<float>& init_vel,
                    int radius,
@@ -18,7 +32,7 @@ Particle::Particle(const juce::Point<float>& init_pos,
                     radius_(radius),
                     color_(color) {
   initial_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
-  current_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
+  current_position_ = initial_position_;
   velocity_ = vmml::Vector2f(init_vel.x, init_vel.y);
   CreateBoundingBox();
 }
@@ -88,9 +102,9 @@ void Particle::SetId(size_t to_id) {
   id_ = to_id;
 }
 
-void Particle::SetVelocity(vmml::Vector2f new_velocity) {
+void Particle::SetVelocity(const juce::Point<float>& new_velocity) {
   initial_position_ = current_position_;
-  velocity_ = new_velocity;
+  velocity_ = vmml::Vector2f(new_velocity.getX(), new_velocity.getY());
   time_ = 0;
 }
 
@@ -111,8 +125,8 @@ bool Particle::DoParticlesCollide(const Particle* particle1,
   return false;
 }
 
-vmml::Vector2f Particle::CalcCollisionVelocity(const Particle* particle1,
-                                               const Particle* particle2) {
+void Particle::SetCollisionVelocity(Particle* particle1,
+                                    Particle* particle2) {
   float m1 = particle1->GetMass();
   float m2 = particle2->GetMass();
   auto v1 = particle1->GetVelocity();
@@ -120,10 +134,17 @@ vmml::Vector2f Particle::CalcCollisionVelocity(const Particle* particle1,
   auto x1 = particle1->GetCurrentPosition();
   auto x2 = particle2->GetCurrentPosition();
   
-  const float mass_ratio = 2 * m2 / (m1 + m2);
-  const float scalar = vmml::dot(v1 - v2, x1 - x2) / ((x1 - x2).length() * (x1 - x2).length());
+  const float mass_ratio_1 = 2 * m2 / (m1 + m2);
+  const float mass_ratio_2 = 2 * m1 / (m1 + m2);
+  const float scalar_1 = vmml::dot(v1 - v2, x1 - x2) /
+                         ((x1 - x2).length() * (x1 - x2).length());
+  const float scalar_2 = vmml::dot(v2 - v1, x2 - x1) /
+                         ((x2 - x1).length() * (x2 - x1).length());
 
-  return v1 - mass_ratio * scalar * (x1 - x2);
+  auto new_vel_1 = v1 - mass_ratio_1 * scalar_1 * (x1 - x2);
+  auto new_vel_2 = v2 - mass_ratio_2 * scalar_2 * (x2 - x1);
+  particle1->SetVelocity(new_vel_1);
+  particle2->SetVelocity(new_vel_2);
 }
 
 bool Particle::operator==(const Particle& other_particle) const {
@@ -171,6 +192,12 @@ AxisAlignedBoundingBox* Particle::GetBoundingBox() {
 
 bool Particle::IsRemoved() const {
   return removed_;
+}
+
+void Particle::SetVelocity(const vmml::Vector2f& new_velocity) {
+  initial_position_ = current_position_;
+  velocity_ = new_velocity;
+  time_ = 0;
 }
 
 bool Particle::AreParticlesApproaching(const Particle* particle1,

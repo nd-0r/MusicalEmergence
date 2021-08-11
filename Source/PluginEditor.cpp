@@ -23,8 +23,8 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   setResizable(true, true);
   setResizeLimits(400, 300, 3200, 2400);
   
-  addAndMakeVisible(add_particle_);
-  add_particle_.addListener(this);
+  addAndMakeVisible(clear_);
+  clear_.addListener(this);
   
   addAndMakeVisible(pause_);
   pause_.addListener(this);
@@ -78,9 +78,9 @@ void SynchronyAudioProcessorEditor::resized()
   pm_.setSize(static_cast<int>(width * kParticleBoxWidth),
               static_cast<int>(height * kParticleBoxHeight));
   
-  add_particle_.setTopLeftPosition(static_cast<int>(width * kMargin),
+  clear_.setTopLeftPosition(static_cast<int>(width * kMargin),
                                    static_cast<int>(height * kMargin));
-  add_particle_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+  clear_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                         kAddParticleBtnHeight);
   
   pause_.setTopLeftPosition(static_cast<int>(width * kMargin),
@@ -123,13 +123,8 @@ void SynchronyAudioProcessorEditor::resized()
 
 void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
   // TODO - implement
-  if (button == &add_particle_) {
-    synchrony::Particle to_add = synchrony::Particle(juce::Point<float>(32, 56),
-                                                     juce::Point<float>(2, 2),
-                                                     10,
-                                                     10,
-                                                     juce::Colours::white);
-    pm_.AddParticle(to_add);
+  if (button == &clear_) {
+    pm_.Reset();
   } else if (button == &pause_) {
     pm_.TogglePause();
   }

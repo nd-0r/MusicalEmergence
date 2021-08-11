@@ -48,7 +48,7 @@ private:
 
   SynchronyAudioProcessor& audioProcessor;
 
-  juce::TextButton add_particle_{"Add Particle"};
+  juce::TextButton clear_{"Clear"};
   juce::TextButton pause_{"Pause"};
   juce::Label particle_speed_label_{"Particle Speed", "Particle Speed"};
   juce::Slider particle_speed_{juce::Slider::SliderStyle::LinearHorizontal,
