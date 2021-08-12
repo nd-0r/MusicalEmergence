@@ -28,6 +28,8 @@ bool ParticleManager::AddParticle(Particle& new_particle) {
 }
 
 void ParticleManager::update() {
+  AddParticlesFromMidiMessages();
+
   auto iter = particles_.begin();
   while (iter != particles_.end()) {
     auto& particle = *iter;
@@ -98,6 +100,29 @@ void ParticleManager::paint(juce::Graphics& g) {
 //    g.setColour(juce::Colours::white);
 //    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
 //  }
+}
+
+bool ParticleManager::AddParticlesFromMidiMessages() {
+  while (!ap_.midi_in_message_queue_.empty()) {
+    auto message = ap_.midi_in_message_queue_.front();
+    ap_.midi_in_message_queue_.pop_front();
+    
+    int radius = static_cast<int>(
+                   std::ceilf(MAX_RADIUS * (1.0f / message.getNoteNumber())));
+    juce::Point<int> init_pos((int) random_generator_() % (getWidth() - radius) + radius,
+                              (int) random_generator_() % (getHeight() - radius) + radius);
+    juce::Point<int> init_vel = static_cast<int>(message.getVelocity()) *
+                                  juce::Point<int>(1, 0);
+    init_vel = init_vel.rotatedAboutOrigin(random_generator_() % 10);
+    auto color = kParticleColors[random_generator_() % kParticleColors.size()];
+    Particle to_add = Particle(init_pos,
+                               init_vel,
+                               radius,
+                               color);
+    if (!AddParticle(to_add)) return false;
+  }
+  
+  return true;
 }
 
 void ParticleManager::FindCollisions() {

@@ -13,7 +13,7 @@ Particle::Particle(const juce::Point<int>& init_pos,
                    const juce::Point<int>& init_vel,
                    int radius,
                    const juce::Colour& color) :
-                    mass_(radius * 2),
+                    mass_(radius * 2), // Mass proportional to radius
                     radius_(radius),
                     color_(color) {
   initial_position_ = vmml::Vector2f(static_cast<float>(init_pos.x),
@@ -198,12 +198,12 @@ bool Particle::IsRemoved() const {
 void Particle::KeepInBounds() {
   if (current_position_.y() >= getParentHeight()) {
     current_position_ = vmml::Vector2f(current_position_.x(),
-                                       getParentHeight() - radius_);
+                                       getParentHeight() - radius_ - 1);
     SetVelocity(velocity_);
   }
   
   if (current_position_.x() >= getParentWidth()) {
-    current_position_ = vmml::Vector2f(getParentWidth() - radius_,
+    current_position_ = vmml::Vector2f(getParentWidth() - radius_ - 1,
                                        current_position_.y());
     SetVelocity(velocity_);
   }

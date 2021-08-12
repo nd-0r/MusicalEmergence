@@ -150,12 +150,19 @@ void SynchronyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+//    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+//    {
+//        auto* channelData = buffer.getWritePointer (channel);
+//
+//        // ..do something to the data...
+//    }
+  
+  for (const auto midi_metadata : midiMessages) {
+    const juce::MidiMessage message = midi_metadata.getMessage();
+    if (message.isNoteOn()) {
+      midi_in_message_queue_.push_back(message);
     }
+  }
 }
 
 //==============================================================================
@@ -181,6 +188,10 @@ void SynchronyAudioProcessor::setStateInformation (const void* data, int sizeInB
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+void SynchronyAudioProcessor::OutputMidiMessage(const juce::MidiMessage& message) {
+  midi_out_message_queue_.push_back(message);
 }
 
 //==============================================================================
