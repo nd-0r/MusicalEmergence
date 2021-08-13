@@ -65,7 +65,12 @@ Particle::~Particle() {
 void Particle::paint(juce::Graphics& g) {
   ++time_;
   time_ %= SynchronySettings::GetClockSize();
-  g.setColour(time_ == 0 ? juce::Colours::white : color_);
+
+  if (!SynchronySettings::IsCollisionMode()) {
+    g.setColour(time_ == 0 ? juce::Colours::white : color_);
+  } else {
+    g.setColour(color_);
+  }
   g.fillEllipse(radius_,
                 radius_,
                 radius_ * kBoundingBoxOfRadius,
@@ -146,13 +151,18 @@ void Particle::SetCollisionVelocity(Particle* particle1,
   const float mass_ratio_2 = kMomentumConstant * m1 / (m1 + m2);
   const float scalar_1 = vmml::dot(v1 - v2, x1 - x2) /
                          ((x1 - x2).length() * (x1 - x2).length());
-  const float scalar_2 = vmml::dot(v2 - v1, x2 - x1) /
+  const float scalar_2 = vmml::dot(v2 - v1, x2 - x1) / // Remove?
                          ((x2 - x1).length() * (x2 - x1).length());
 
   auto new_vel_1 = v1 - mass_ratio_1 * scalar_1 * (x1 - x2);
   auto new_vel_2 = v2 - mass_ratio_2 * scalar_2 * (x2 - x1);
   particle1->SetVelocity(new_vel_1);
   particle2->SetVelocity(new_vel_2);
+  
+  if (SynchronySettings::IsCollisionMode()) {
+    particle1->PlayMidiNote();
+    particle2->PlayMidiNote();
+  }
 }
 
 bool Particle::operator==(const Particle& other_particle) const {
@@ -164,6 +174,10 @@ bool Particle::operator==(const Particle& other_particle) const {
 
 bool Particle::operator!=(const Particle& other_particle) const {
   return !operator==(other_particle);
+}
+
+void Particle::PlayMidiNote() {
+  ap_.OutputMidiMessage(midi_data_);
 }
 
 void Particle::CreateBoundingBox() {

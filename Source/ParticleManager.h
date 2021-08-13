@@ -8,8 +8,8 @@
 #pragma once
 
 #define MAX_PARTICLES 600
-#define MAX_RADIUS 32
-#define MIN_RADIUS 8
+#define MAX_RADIUS 64
+#define MIN_RADIUS 4
 
 #include <random>
 #include <chrono>
@@ -59,7 +59,6 @@ private:
   constexpr static float kMidiParticleVelocityMultiplier = 0.03f;
   const std::vector<juce::Colour> kParticleColors = {
     juce::Colour(242, 131, 103),
-    juce::Colour(246, 156, 110),
     juce::Colour(251, 186, 119),
     juce::Colour(255, 248, 136),
     juce::Colour(184, 218, 137),
@@ -71,9 +70,6 @@ private:
     juce::Colour(113, 127, 190),
     juce::Colour(116, 107, 175),
     juce::Colour(142, 113, 177),
-    juce::Colour(173, 119, 178),
-    juce::Colour(240, 132, 180),
-    juce::Colour(241, 130, 140),
   };
 
   bool AddParticlesFromMidiMessages();

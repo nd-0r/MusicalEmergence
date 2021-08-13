@@ -65,6 +65,7 @@ private:
   constexpr static float kMassProportion = 1.5f;
   constexpr static float kMomentumConstant = 2.0f;
   constexpr static int kBoundingBoxOfRadius = 2;
+  constexpr static int kMidiNoteLength = 10;
 
   void PlayMidiNote();
   void CreateBoundingBox();

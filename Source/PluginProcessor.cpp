@@ -131,39 +131,53 @@ bool SynchronyAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 
 void SynchronyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+  juce::ScopedNoDenormals noDenormals;
+  auto totalNumInputChannels  = getTotalNumInputChannels();
+  auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-//    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-//    {
-//        auto* channelData = buffer.getWritePointer (channel);
-//
-//        // ..do something to the data...
-//    }
+  for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+      buffer.clear (i, 0, buffer.getNumSamples());
   
   for (const auto midi_metadata : midiMessages) {
     const auto message = midi_metadata.getMessage();
     if (message.isNoteOn()) {
       midi_in_message_queue_.push_back(
-        MidiData(message.getNoteNumber(), message.getVelocity())
+        MidiData(message.getNoteNumber(),
+                 message.getVelocity())
       );
     }
+  }
+
+  for (MidiData& midi_data : midi_out_message_queue_) {
+    if (!midi_data.sent_note_on_) {
+      auto on_message = juce::MidiMessage::noteOn(1, midi_data.note_num_,
+                                                  juce::uint8(midi_data.velocity_));
+      on_message.setTimeStamp(juce::Time::getMillisecondCounterHiRes() *
+                              0.001 - startTime);
+      midiMessages.addEvent(on_message, 0);
+
+      midi_data.off_timestamp_ = juce::Time::getMillisecondCounterHiRes() -
+                                 startTime + SynchronySettings::GetNoteLength();
+      midi_data.sent_note_on_ = true;
+    }
+  }
+
+  auto iter = midi_out_message_queue_.begin();
+  while (iter != midi_out_message_queue_.end()) {
+    MidiData& midi_data = *iter;
+
+    if (midi_data.off_timestamp_ < juce::Time::getMillisecondCounterHiRes() - startTime) {
+      auto off_message = juce::MidiMessage::noteOff(1, midi_data.note_num_,
+                                                    juce::uint8(midi_data.velocity_));
+      off_message.setTimeStamp(juce::Time::getMillisecondCounterHiRes() *
+                               0.001 - startTime);
+      midiMessages.addEvent(off_message, 0);
+      
+      midi_out_message_queue_.erase(iter++);
+      continue;
+    }
+
+    ++iter;
   }
 }
 
@@ -192,8 +206,8 @@ void SynchronyAudioProcessor::setStateInformation (const void* data, int sizeInB
     // whose contents will have been created by the getStateInformation() call.
 }
 
-void SynchronyAudioProcessor::OutputMidiMessage(const juce::MidiMessage& message) {
-  midi_out_message_queue_.push_back(message);
+void SynchronyAudioProcessor::OutputMidiMessage(const MidiData& data) {
+  midi_out_message_queue_.push_back(data);
 }
 
 //==============================================================================

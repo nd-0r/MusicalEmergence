@@ -72,6 +72,18 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   nudge_amount_.setDoubleClickReturnValue(true, SynchronySettings::clockStepSize);
   nudge_amount_.setValue(SynchronySettings::clockStepSize);
   
+  addAndMakeVisible(note_length_label_);
+  note_length_label_.setColour(juce::Label::ColourIds::textColourId,
+                               getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
+  
+  addAndMakeVisible(note_length_);
+  note_length_.addListener(this);
+  note_length_.setRange(SynchronySettings::kMinNoteLength,
+                        SynchronySettings::kMaxNoteLength,
+                        10);
+  note_length_.setDoubleClickReturnValue(true, SynchronySettings::noteLength);
+  note_length_.setValue(SynchronySettings::noteLength);
+  
   addAndMakeVisible(pm_);
 }
 
@@ -138,6 +150,16 @@ void SynchronyAudioProcessorEditor::resized()
                                      particle_speed_label_.getY() + kTextBoxHeight + 5);
   particle_speed_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                           kSliderHeight);
+  
+  note_length_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                                        particle_speed_.getY() + kSliderHeight + kSettingsSpacer);
+  note_length_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+                             kTextBoxHeight);
+  
+  note_length_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                                  note_length_label_.getY() + kTextBoxHeight + 5);
+  note_length_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+                       kSliderHeight);
 }
 
 void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
@@ -157,5 +179,7 @@ void SynchronyAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
     SynchronySettings::clockSize = static_cast<unsigned int>(slider->getValue());
   } else if (slider == &nudge_amount_) {
     SynchronySettings::clockStepSize = static_cast<int>(slider->getValue());
+  } else if (slider == &note_length_) {
+    SynchronySettings::noteLength = slider->getValue();
   }
 }

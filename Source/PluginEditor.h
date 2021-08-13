@@ -67,6 +67,9 @@ private:
   juce::Label nudge_amount_label_{"Nudge Amount", "Nudge Amount"};
   juce::Slider nudge_amount_{juce::Slider::SliderStyle::LinearHorizontal,
                              juce::Slider::TextEntryBoxPosition::TextBoxBelow};
+  juce::Label note_length_label_{"Note Length", "Note Length"};
+  juce::Slider note_length_{juce::Slider::SliderStyle::LinearHorizontal,
+                            juce::Slider::TextEntryBoxPosition::NoTextBox};
   
   synchrony::ParticleManager pm_{audioProcessor};
   

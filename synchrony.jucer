@@ -3,9 +3,10 @@
 <JUCERPROJECT id="HO2u01" name="synchrony" projectType="audioplug" useAppConfig="1"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginVST3Category="Instrument" headerPath="/usr/local/include/vmmlib"
-              pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginManufacturer="Andrew Orals" aaxIdentifier="com.andreworals.synchrony"
-              bundleIdentifier="com.andreworals.synchrony" pluginFormats="buildVST3">
+              bundleIdentifier="com.andreworals.synchrony" pluginFormats="buildAU,buildVST3"
+              pluginName="Synchrony">
   <MAINGROUP id="Oz8per" name="synchrony">
     <GROUP id="{8B7AEF32-EDD5-5D1B-85AF-951D2281DCBD}" name="Source">
       <FILE id="yDaYl4" name="SynchronySettings.cpp" compile="1" resource="0"

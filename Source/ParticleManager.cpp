@@ -119,7 +119,7 @@ bool ParticleManager::AddParticlesFromMidiMessages() {
     juce::Point<int> init_vel = int(kMidiParticleVelocityMultiplier * message.velocity_) *
                                 juce::Point<int>(random_generator_() % 2,
                                                  random_generator_() % 2);
-    auto color = kParticleColors[random_generator_() % kParticleColors.size()];
+    auto color = kParticleColors[size_t(message.note_num_ % int(kParticleColors.size()))];
     Particle to_add = Particle(ap_,
                                init_pos,
                                init_vel,

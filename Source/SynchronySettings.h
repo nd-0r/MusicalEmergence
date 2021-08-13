@@ -19,6 +19,7 @@ public:
   static bool ShouldShowAABBsAndPairs() { return showAABBsAndPairs; }
   static unsigned int GetClockSize() { return clockSize; }
   static int GetClockStepSize() { return clockStepSize; }
+  static double GetNoteLength() { return noteLength; }
 protected:
   constexpr static float kMinVelocityMultiplier = 0.1f;
   constexpr static float kMaxVelocityMultiplier = 2.0f;
@@ -26,12 +27,15 @@ protected:
   constexpr static int kMaxClockSize = 64;
   constexpr static int kMinClockStepSize = 1;
   constexpr static int kMaxClockStepSize = 32;
+  constexpr static double kMinNoteLength = 10;
+  constexpr static double kMaxNoteLength = 2000;
 
   static float velocityMultiplier;
   static bool showAABBsAndPairs;
   static bool collisionMode;
   static unsigned int clockSize;
   static int clockStepSize;
+  static double noteLength;
 };
 
 } // namespace synchrony

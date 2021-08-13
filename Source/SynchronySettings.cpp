@@ -17,5 +17,6 @@ bool SynchronySettings::showAABBsAndPairs = false;
 bool SynchronySettings::collisionMode = true;
 unsigned int SynchronySettings::clockSize = 12;
 int SynchronySettings::clockStepSize = 1;
+double SynchronySettings::noteLength = 250;
 
 } // namespace synchrony

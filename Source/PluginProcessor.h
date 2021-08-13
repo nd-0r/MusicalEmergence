@@ -17,6 +17,8 @@ struct MidiData {
 
   int note_num_;
   int velocity_;
+  double off_timestamp_ = 0;
+  bool sent_note_on_ = false;
 };
 
 //==============================================================================
@@ -62,10 +64,12 @@ public:
   void setStateInformation (const void* data, int sizeInBytes) override;
   
   //==============================================================================
-  void OutputMidiMessage(const juce::MidiMessage& message);
+  void OutputMidiMessage(const MidiData& data);
+  double GetStartTime() const { return startTime; }
   
   std::list<MidiData> midi_in_message_queue_;
 private:
-  std::list<juce::MidiMessage> midi_out_message_queue_;
+  std::list<MidiData> midi_out_message_queue_;
+  double startTime{juce::Time::getMillisecondCounterHiRes() * 0.001};
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronyAudioProcessor)
 };
