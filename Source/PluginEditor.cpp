@@ -18,7 +18,6 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   CustomUnitTestRunner runner;
   runner.runAllTests();
 #endif
-
   setSize (400, 300);
   setResizable(true, true);
   setResizeLimits(400, 300, 3200, 2400);

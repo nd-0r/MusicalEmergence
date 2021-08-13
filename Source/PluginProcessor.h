@@ -10,6 +10,15 @@
 
 #include <JuceHeader.h>
 
+struct MidiData {
+  MidiData(int note_num, int vel) :
+    note_num_(note_num),
+    velocity_(vel) {}
+
+  int note_num_;
+  int velocity_;
+};
+
 //==============================================================================
 /**
 */
@@ -55,7 +64,7 @@ public:
   //==============================================================================
   void OutputMidiMessage(const juce::MidiMessage& message);
   
-  std::list<juce::MidiMessage> midi_in_message_queue_;
+  std::list<MidiData> midi_in_message_queue_;
 private:
   std::list<juce::MidiMessage> midi_out_message_queue_;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronyAudioProcessor)

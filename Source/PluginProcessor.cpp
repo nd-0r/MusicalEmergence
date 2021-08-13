@@ -158,9 +158,11 @@ void SynchronyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 //    }
   
   for (const auto midi_metadata : midiMessages) {
-    const juce::MidiMessage message = midi_metadata.getMessage();
+    const auto message = midi_metadata.getMessage();
     if (message.isNoteOn()) {
-      midi_in_message_queue_.push_back(message);
+      midi_in_message_queue_.push_back(
+        MidiData(message.getNoteNumber(), message.getVelocity())
+      );
     }
   }
 }
