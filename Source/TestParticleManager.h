@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#pragma once
+
 #include <JuceHeader.h>
 
 #include "Particle.h"
@@ -101,8 +103,8 @@ private:
     auto p2_vel = juce::Point<float>(0, 0);
     const std::vector<std::pair<Particle, Particle>> kExpected = {};
     
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -118,8 +120,8 @@ private:
     auto p2_pos = juce::Point<float>(16, 32);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -140,8 +142,8 @@ private:
     auto p2_pos = juce::Point<float>(16, 32);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -162,8 +164,8 @@ private:
     auto p2_pos = juce::Point<float>(32, 16);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -184,8 +186,8 @@ private:
     auto p2_pos = juce::Point<float>(32, 16);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -206,8 +208,8 @@ private:
     auto p2_pos = juce::Point<float>(32, 32);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);
@@ -228,8 +230,8 @@ private:
     auto p2_pos = juce::Point<float>(32, 32);
     auto p2_vel = juce::Point<float>(0, 0);
 
-    Particle p1 = Particle(p1_pos, p1_vel);
-    Particle p2 = Particle(p2_pos, p2_vel);
+    Particle p1 = Particle(sap_, p1_pos, p1_vel);
+    Particle p2 = Particle(sap_, p2_pos, p2_vel);
     
     pm_to_test_.AddParticle(p1);
     pm_to_test_.AddParticle(p2);

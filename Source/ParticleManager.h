@@ -53,6 +53,10 @@ public:
   void paint(juce::Graphics& g) override;
 
 private:
+  constexpr static int kMouseHoldMSToAddParticle = 100;
+  constexpr static int kDragParticleRadius = 10;
+  constexpr static float kDragParticleVelocityMultiplier = 0.01f;
+  constexpr static float kMidiParticleVelocityMultiplier = 0.03f;
   const std::vector<juce::Colour> kParticleColors = {
     juce::Colour(242, 131, 103),
     juce::Colour(246, 156, 110),

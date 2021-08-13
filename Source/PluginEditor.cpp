@@ -18,9 +18,9 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   CustomUnitTestRunner runner;
   runner.runAllTests();
 #endif
-  setSize (400, 300);
+  setSize (MIN_WIDTH, MIN_HEIGHT);
   setResizable(true, true);
-  setResizeLimits(400, 300, 3200, 2400);
+  setResizeLimits(MIN_WIDTH, MIN_HEIGHT, MAX_WIDTH, MAX_HEIGHT);
   
   addAndMakeVisible(clear_);
   clear_.addListener(this);
@@ -28,23 +28,33 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   addAndMakeVisible(pause_);
   pause_.addListener(this);
   
+  addAndMakeVisible(show_aabbs_);
+  show_aabbs_.addListener(this);
+  
   addAndMakeVisible(particle_speed_label_);
   particle_speed_label_.setColour(juce::Label::ColourIds::textColourId,
                                   getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
-  particle_speed_label_.addListener(this);
   
   addAndMakeVisible(particle_speed_);
   particle_speed_.setTextBoxIsEditable(false);
   particle_speed_.addListener(this);
+  particle_speed_.setRange(SynchronySettings::kMinVelocityMultiplier,
+                           SynchronySettings::kMaxVelocityMultiplier);
+  particle_speed_.setDoubleClickReturnValue(true, SynchronySettings::velocityMultiplier);
+  particle_speed_.setValue(SynchronySettings::velocityMultiplier);
   
-  addAndMakeVisible(clock_speed_label_);
-  clock_speed_label_.setColour(juce::Label::ColourIds::textColourId,
+  addAndMakeVisible(clock_size_label_);
+  clock_size_label_.setColour(juce::Label::ColourIds::textColourId,
                                getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
-  clock_speed_label_.addListener(this);
   
-  addAndMakeVisible(clock_speed_);
-  clock_speed_.setTextBoxIsEditable(false);
-  clock_speed_.addListener(this);
+  addAndMakeVisible(clock_size_);
+  clock_size_.setTextBoxIsEditable(false);
+  clock_size_.addListener(this);
+  clock_size_.setRange(SynchronySettings::kMinClockSize,
+                       SynchronySettings::kMaxClockSize,
+                       1);
+  clock_size_.setDoubleClickReturnValue(true, SynchronySettings::clockSize);
+  clock_size_.setValue(SynchronySettings::clockSize);
   
 //  addAndMakeVisible(use_tempo_);
 //  use_tempo_.addListener(this);
@@ -52,11 +62,15 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   addAndMakeVisible(nudge_amount_label_);
   nudge_amount_label_.setColour(juce::Label::ColourIds::textColourId,
                                 getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
-  nudge_amount_label_.addListener(this);
   
   addAndMakeVisible(nudge_amount_);
   nudge_amount_.setTextBoxIsEditable(false);
   nudge_amount_.addListener(this);
+  nudge_amount_.setRange(SynchronySettings::kMinClockStepSize,
+                         SynchronySettings::kMaxClockStepSize,
+                         1);
+  nudge_amount_.setDoubleClickReturnValue(true, SynchronySettings::clockStepSize);
+  nudge_amount_.setValue(SynchronySettings::clockStepSize);
   
   addAndMakeVisible(pm_);
 }
@@ -89,18 +103,24 @@ void SynchronyAudioProcessorEditor::resized()
   pause_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                  kAddParticleBtnHeight);
   
-  clock_speed_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
+  show_aabbs_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                                 pause_.getY() + kSettingsSpacer +
+                                 kAddParticleBtnHeight);
+  show_aabbs_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+                      kAddParticleBtnHeight);
+  
+  clock_size_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
                                         static_cast<int>(0.3 * height));
-  clock_speed_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+  clock_size_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                              kTextBoxHeight);
   
-  clock_speed_.setTopLeftPosition(static_cast<int>(width * kMargin),
-                                  clock_speed_label_.getY() + kTextBoxHeight + 5);
-  clock_speed_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+  clock_size_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                                  clock_size_label_.getY() + kTextBoxHeight + 5);
+  clock_size_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                        kSliderHeight);
   
   nudge_amount_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
-                                         clock_speed_.getY() + kSliderHeight + kSettingsSpacer);
+                                         clock_size_.getY() + kSliderHeight + kSettingsSpacer);
   nudge_amount_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                               kTextBoxHeight);
   
@@ -121,18 +141,21 @@ void SynchronyAudioProcessorEditor::resized()
 }
 
 void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
-  // TODO - implement
   if (button == &clear_) {
     pm_.Reset();
   } else if (button == &pause_) {
     pm_.TogglePause();
+  } else if (button == &show_aabbs_) {
+    SynchronySettings::showAABBsAndPairs = !SynchronySettings::showAABBsAndPairs;
   }
 }
 
-void SynchronyAudioProcessorEditor::labelTextChanged (juce::Label* labelThatHasChanged) {
-  // TODO - implement
-}
-
 void SynchronyAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
-  // TODO - implement
+  if (slider == &particle_speed_) {
+    SynchronySettings::velocityMultiplier = static_cast<float>(slider->getValue());
+  } else if (slider == &clock_size_) {
+    SynchronySettings::clockSize = static_cast<int>(slider->getValue());
+  } else if (slider == &nudge_amount_) {
+    SynchronySettings::clockStepSize = static_cast<unsigned int>(slider->getValue());
+  }
 }

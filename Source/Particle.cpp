@@ -9,7 +9,8 @@
 
 namespace synchrony {
 
-Particle::Particle(const juce::Point<int>& init_pos,
+Particle::Particle(SynchronyAudioProcessor& ap,
+                   const juce::Point<int>& init_pos,
                    const juce::Point<int>& init_vel,
                    int radius,
                    const juce::Colour& color,
@@ -17,7 +18,8 @@ Particle::Particle(const juce::Point<int>& init_pos,
                     mass_(radius * kMassProportion),
                     radius_(radius),
                     midi_data_(midi_data),
-                    color_(color) {
+                    color_(color),
+                    ap_(ap) {
   initial_position_ = vmml::Vector2f(static_cast<float>(init_pos.x),
                                      static_cast<float>(init_pos.y));
   current_position_ = initial_position_;
@@ -25,7 +27,8 @@ Particle::Particle(const juce::Point<int>& init_pos,
   CreateBoundingBox();
 }
 
-Particle::Particle(const juce::Point<float>& init_pos,
+Particle::Particle(SynchronyAudioProcessor& ap,
+                   const juce::Point<float>& init_pos,
                    const juce::Point<float>& init_vel,
                    int radius,
                    float mass,
@@ -34,14 +37,16 @@ Particle::Particle(const juce::Point<float>& init_pos,
                     mass_(mass),
                     radius_(radius),
                     midi_data_(midi_data),
-                    color_(color) {
+                    color_(color),
+                    ap_(ap) {
   initial_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
   current_position_ = initial_position_;
   velocity_ = vmml::Vector2f(init_vel.x, init_vel.y);
   CreateBoundingBox();
 }
 
-Particle::Particle(const Particle& other) : midi_data_(48, 0) {
+Particle::Particle(const Particle& other) : midi_data_(other.midi_data_),
+                                            ap_(other.ap_) {
   id_ = other.id_;
   time_ = other.time_;
   initial_position_ = other.initial_position_;
@@ -49,30 +54,12 @@ Particle::Particle(const Particle& other) : midi_data_(48, 0) {
   velocity_ = other.velocity_;
   mass_ = other.mass_;
   radius_ = other.radius_;
-  midi_data_ = other.midi_data_;
   color_ = other.color_;
   CreateBoundingBox();
 }
 
 Particle::~Particle() {
   // No dynamic storage to manage
-}
-
-void Particle::CreateBoundingBox() {
-  low_x_ = EndPoint(this,
-                    current_position_.x() - kBoundingBoxOfRadius * radius_,
-                    true);
-  high_x_ = EndPoint(this,
-                     current_position_.x() + kBoundingBoxOfRadius * radius_,
-                     false);
-  low_y_ = EndPoint(this,
-                    current_position_.y() - kBoundingBoxOfRadius * radius_,
-                    true);
-  high_y_ = EndPoint(this,
-                     current_position_.y() + kBoundingBoxOfRadius * radius_,
-                     false);
-                      
-  bounding_box_ = AxisAlignedBoundingBox(&low_x_, &high_x_, &low_y_, &high_y_);
 }
 
 void Particle::paint(juce::Graphics& g) {
@@ -82,7 +69,13 @@ void Particle::paint(juce::Graphics& g) {
                 radius_ * kBoundingBoxOfRadius,
                 radius_ * kBoundingBoxOfRadius);
 
-//  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
+  if (SynchronySettings::ShouldShowAABBsAndPairs()) {
+    g.drawRect(0, 0,
+               static_cast<int>(bounding_box_.bounds_x.second->GetValue() -
+                                bounding_box_.bounds_x.first->GetValue()),
+               static_cast<int>(bounding_box_.bounds_y.second->GetValue() -
+                                bounding_box_.bounds_y.first->GetValue()));
+  }
 }
 
 void Particle::mouseDown(const juce::MouseEvent& event) {
@@ -95,8 +88,9 @@ void Particle::UpdatePosition() {
   KeepInBounds();
   if (!removed_) {
     ++time_;
+    time_ %= SynchronySettings::GetClockStepSize();
 
-    current_position_ = initial_position_ + (velocity_ * time_);
+    current_position_ += (velocity_ * SynchronySettings::GetVelocityMultiplier());
     setBounds((int) current_position_.x() - 2 * radius_,
               (int) current_position_.y() - 2 * radius_,
               radius_ * 4,
@@ -120,9 +114,7 @@ void Particle::SetId(size_t to_id) {
 }
 
 void Particle::SetVelocity(const juce::Point<float>& new_velocity) {
-  initial_position_ = current_position_;
   velocity_ = vmml::Vector2f(new_velocity.getX(), new_velocity.getY());
-  time_ = 0;
 }
 
 bool Particle::DoParticlesCollide(const Particle* particle1,
@@ -175,40 +167,21 @@ bool Particle::operator!=(const Particle& other_particle) const {
   return !operator==(other_particle);
 }
 
-size_t Particle::GetId() const {
-  return id_;
-}
-
-const vmml::Vector2f& Particle::GetInitialPosition() const {
-  return initial_position_;
-}
-
-const vmml::Vector2f& Particle::GetCurrentPosition() const {
-  return current_position_;
-}
-
-const vmml::Vector2f& Particle::GetVelocity() const {
-  return velocity_;
-}
-
-int Particle::GetRadius() const {
-  return radius_;
-}
-
-float Particle::GetMass() const {
-  return mass_;
-}
-
-const juce::Colour& Particle::GetColor() const {
-  return color_;
-}
-
-AxisAlignedBoundingBox* Particle::GetBoundingBox() {
-  return &bounding_box_;
-}
-
-bool Particle::IsRemoved() const {
-  return removed_;
+void Particle::CreateBoundingBox() {
+  low_x_ = EndPoint(this,
+                    current_position_.x() - kBoundingBoxOfRadius * radius_,
+                    true);
+  high_x_ = EndPoint(this,
+                     current_position_.x() + kBoundingBoxOfRadius * radius_,
+                     false);
+  low_y_ = EndPoint(this,
+                    current_position_.y() - kBoundingBoxOfRadius * radius_,
+                    true);
+  high_y_ = EndPoint(this,
+                     current_position_.y() + kBoundingBoxOfRadius * radius_,
+                     false);
+                      
+  bounding_box_ = AxisAlignedBoundingBox(&low_x_, &high_x_, &low_y_, &high_y_);
 }
 
 void Particle::KeepInBounds() {

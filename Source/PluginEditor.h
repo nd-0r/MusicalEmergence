@@ -8,8 +8,14 @@
 
 #pragma once
 
+#define MAX_WIDTH 3200
+#define MAX_HEIGHT 2400
+#define MIN_WIDTH 600
+#define MIN_HEIGHT 450
+
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "SynchronySettings.h"
 #include "ParticleManager.h"
 #include "Particle.h"
 
@@ -23,8 +29,8 @@
 */
 class SynchronyAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                               juce::TextButton::Listener,
-                                              juce::Label::Listener,
-                                              juce::Slider::Listener {
+                                              juce::Slider::Listener,
+                                       private synchrony::SynchronySettings {
 public:
   SynchronyAudioProcessorEditor (SynchronyAudioProcessor&);
   ~SynchronyAudioProcessorEditor() override;
@@ -33,7 +39,6 @@ public:
   void resized() override;
                                                 
   void buttonClicked(juce::Button* button) override;
-  void labelTextChanged (juce::Label* labelThatHasChanged) override;
   void sliderValueChanged(juce::Slider* slider) override;
 
 private:
@@ -50,11 +55,13 @@ private:
 
   juce::TextButton clear_{"Clear"};
   juce::TextButton pause_{"Pause"};
+  juce::TextButton show_aabbs_{"Show AABBs"};
+
   juce::Label particle_speed_label_{"Particle Speed", "Particle Speed"};
   juce::Slider particle_speed_{juce::Slider::SliderStyle::LinearHorizontal,
                                juce::Slider::TextEntryBoxPosition::TextBoxBelow};
-  juce::Label clock_speed_label_{"Clock Speed", "Clock Speed"};
-  juce::Slider clock_speed_{juce::Slider::SliderStyle::LinearHorizontal,
+  juce::Label clock_size_label_{"Clock Speed", "Clock Speed"};
+  juce::Slider clock_size_{juce::Slider::SliderStyle::LinearHorizontal,
                             juce::Slider::TextEntryBoxPosition::TextBoxBelow};
 //  juce::ToggleButton use_tempo_{"Use Tempo"};
   juce::Label nudge_amount_label_{"Nudge Amount", "Nudge Amount"};

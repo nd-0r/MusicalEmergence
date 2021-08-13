@@ -57,10 +57,11 @@ void ParticleManager::update() {
 
 void ParticleManager::mouseDown(const juce::MouseEvent& event) {
   if (event.originalComponent == this &&
-      event.getLengthOfMousePress() < 100) {
-    Particle to_add = Particle(event.getPosition(),
+      event.getLengthOfMousePress() < kMouseHoldMSToAddParticle) {
+    Particle to_add = Particle(ap_,
+                               event.getPosition(),
                                juce::Point<int>(1, 1),
-                               10);
+                               kDragParticleRadius);
     adding_particle_ = AddParticle(to_add);
   }
 }
@@ -68,12 +69,13 @@ void ParticleManager::mouseDown(const juce::MouseEvent& event) {
 void ParticleManager::mouseUp(const juce::MouseEvent& event) {
   if (event.originalComponent == this &&
       adding_particle_ &&
-      event.getLengthOfMousePress() < 100) {
+      event.getLengthOfMousePress() < kMouseHoldMSToAddParticle) {
     auto new_velocity = juce::Point<float>(1, 1);
     particles_.back()->SetVelocity(new_velocity);
   } else if (event.originalComponent == this &&
              adding_particle_) {
-    auto new_velocity = event.getOffsetFromDragStart().toFloat() * 0.015;
+    auto new_velocity = event.getOffsetFromDragStart().toFloat() *
+                        kDragParticleVelocityMultiplier;
     particles_.back()->SetVelocity(new_velocity);
   }
   adding_particle_ = false;
@@ -90,16 +92,19 @@ void ParticleManager::Reset() {
   positions_x_.clear();
   positions_y_.clear();
   collision_candidate_pairs_.clear();
+  paused_ = false;
 }
 
 void ParticleManager::paint(juce::Graphics& g) {
-  g.fillAll(juce::Colours::black);
+  g.fillAll((paused_ || adding_particle_) ?
+            juce::Colours::darkgrey : juce::Colours::black);
 
-//  // TODO - remove
-//  for (auto& pair : collision_candidate_pairs_) {
-//    g.setColour(juce::Colours::white);
-//    g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
-//  }
+  if (SynchronySettings::ShouldShowAABBsAndPairs()) {
+    for (auto& pair : collision_candidate_pairs_) {
+      g.setColour(juce::Colours::white);
+      g.drawLine(pair.first->GetCurrentPosition().x(), pair.first->GetCurrentPosition().y(), pair.second->GetCurrentPosition().x(), pair.second->GetCurrentPosition().y());
+    }
+  }
 }
 
 bool ParticleManager::AddParticlesFromMidiMessages() {
@@ -111,11 +116,12 @@ bool ParticleManager::AddParticlesFromMidiMessages() {
                                 + MIN_RADIUS));
     juce::Point<int> init_pos((int) random_generator_() % (getWidth() - radius) + radius,
                               (int) random_generator_() % (getHeight() - radius) + radius);
-    juce::Point<int> init_vel = int(0.08f * message.velocity_) *
-                                  juce::Point<int>(random_generator_() % 2,
-                                                   random_generator_() % 2);
+    juce::Point<int> init_vel = int(kMidiParticleVelocityMultiplier * message.velocity_) *
+                                juce::Point<int>(random_generator_() % 2,
+                                                 random_generator_() % 2);
     auto color = kParticleColors[random_generator_() % kParticleColors.size()];
-    Particle to_add = Particle(init_pos,
+    Particle to_add = Particle(ap_,
+                               init_pos,
                                init_vel,
                                radius,
                                color,
