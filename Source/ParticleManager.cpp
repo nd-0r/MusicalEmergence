@@ -105,20 +105,19 @@ void ParticleManager::paint(juce::Graphics& g) {
 bool ParticleManager::AddParticlesFromMidiMessages() {
   while (!ap_.midi_in_message_queue_.empty()) {
     auto message = ap_.midi_in_message_queue_.front();
-    ap_.midi_in_message_queue_.pop_front();
-    
-    int radius = static_cast<int>(
-                   std::ceilf(MAX_RADIUS * (1.0f / message.getNoteNumber())));
+
+    const int radius = message.getNoteNumber();
+
     juce::Point<int> init_pos((int) random_generator_() % (getWidth() - radius) + radius,
                               (int) random_generator_() % (getHeight() - radius) + radius);
-    juce::Point<int> init_vel = static_cast<int>(message.getVelocity()) *
+    juce::Point<int> init_vel = int(0.1f * message.getVelocity()) *
                                   juce::Point<int>(1, 0);
-    init_vel = init_vel.rotatedAboutOrigin(random_generator_() % 10);
     auto color = kParticleColors[random_generator_() % kParticleColors.size()];
     Particle to_add = Particle(init_pos,
                                init_vel,
                                radius,
                                color);
+    ap_.midi_in_message_queue_.pop_front();
     if (!AddParticle(to_add)) return false;
   }
   
