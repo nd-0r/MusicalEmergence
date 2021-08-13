@@ -63,7 +63,9 @@ Particle::~Particle() {
 }
 
 void Particle::paint(juce::Graphics& g) {
-  g.setColour(color_);
+  ++time_;
+  time_ %= SynchronySettings::GetClockSize();
+  g.setColour(time_ == 0 ? juce::Colours::white : color_);
   g.fillEllipse(radius_,
                 radius_,
                 radius_ * kBoundingBoxOfRadius,
@@ -87,9 +89,6 @@ void Particle::mouseDown(const juce::MouseEvent& event) {
 void Particle::UpdatePosition() {
   KeepInBounds();
   if (!removed_) {
-    ++time_;
-    time_ %= SynchronySettings::GetClockStepSize();
-
     current_position_ += (velocity_ * SynchronySettings::GetVelocityMultiplier());
     setBounds((int) current_position_.x() - 2 * radius_,
               (int) current_position_.y() - 2 * radius_,

@@ -15,7 +15,7 @@ namespace synchrony {
 float SynchronySettings::velocityMultiplier = 1.0f;
 bool SynchronySettings::showAABBsAndPairs = false;
 bool SynchronySettings::collisionMode = true;
-int SynchronySettings::clockSize = 12;
-unsigned int SynchronySettings::clockStepSize = 1;
+unsigned int SynchronySettings::clockSize = 12;
+int SynchronySettings::clockStepSize = 1;
 
 } // namespace synchrony

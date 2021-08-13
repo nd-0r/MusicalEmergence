@@ -17,8 +17,8 @@ public:
   static float GetVelocityMultiplier() { return velocityMultiplier; }
   static bool IsCollisionMode() { return collisionMode; }
   static bool ShouldShowAABBsAndPairs() { return showAABBsAndPairs; }
-  static int GetClockSize() { return clockSize; }
-  static unsigned int GetClockStepSize() { return clockStepSize; }
+  static unsigned int GetClockSize() { return clockSize; }
+  static int GetClockStepSize() { return clockStepSize; }
 protected:
   constexpr static float kMinVelocityMultiplier = 0.1f;
   constexpr static float kMaxVelocityMultiplier = 2.0f;
@@ -30,8 +30,8 @@ protected:
   static float velocityMultiplier;
   static bool showAABBsAndPairs;
   static bool collisionMode;
-  static int clockSize;
-  static unsigned int clockStepSize;
+  static unsigned int clockSize;
+  static int clockStepSize;
 };
 
 } // namespace synchrony

@@ -154,8 +154,8 @@ void SynchronyAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
   if (slider == &particle_speed_) {
     SynchronySettings::velocityMultiplier = static_cast<float>(slider->getValue());
   } else if (slider == &clock_size_) {
-    SynchronySettings::clockSize = static_cast<int>(slider->getValue());
+    SynchronySettings::clockSize = static_cast<unsigned int>(slider->getValue());
   } else if (slider == &nudge_amount_) {
-    SynchronySettings::clockStepSize = static_cast<unsigned int>(slider->getValue());
+    SynchronySettings::clockStepSize = static_cast<int>(slider->getValue());
   }
 }
