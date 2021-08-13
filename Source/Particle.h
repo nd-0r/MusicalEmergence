@@ -9,6 +9,7 @@
 
 #include <JuceHeader.h>
 #include <vector.hpp>
+#include "PluginProcessor.h"
 #include "ParticleManager.h"
 #include "Utilities.h"
 
@@ -19,13 +20,15 @@ public:
   Particle(const juce::Point<int>& init_pos,
            const juce::Point<int>& init_vel,
            int radius=4,
-           const juce::Colour& color=juce::Colour(255, 255, 255));
+           const juce::Colour& color=juce::Colour(255, 255, 255),
+           const MidiData& midi_data=MidiData(48, 0));
 
   Particle(const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
            int radius=4,
            float mass=10,
-           const juce::Colour& color=juce::Colour(255, 255, 255));
+           const juce::Colour& color=juce::Colour(255, 255, 255),
+           const MidiData& midi_data=MidiData(48, 0));
   Particle(const Particle& other);
   ~Particle() override;
   void CreateBoundingBox();
@@ -56,6 +59,10 @@ public:
                                    Particle* particle2);
   
 private:
+  constexpr static float kMassProportion = 1.5f;
+  constexpr static float kMomentumConstant = 2.0f;
+  constexpr static int kBoundingBoxOfRadius = 2;
+
   void KeepInBounds();
 
   void SetVelocity(const vmml::Vector2f& new_velocity);
@@ -70,6 +77,8 @@ private:
   vmml::Vector2f velocity_;
   float mass_;
   int radius_;
+  MidiData midi_data_;
+
   bool removed_ = false;
   EndPoint low_x_;
   EndPoint high_x_;

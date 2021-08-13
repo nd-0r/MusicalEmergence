@@ -12,9 +12,11 @@ namespace synchrony {
 Particle::Particle(const juce::Point<int>& init_pos,
                    const juce::Point<int>& init_vel,
                    int radius,
-                   const juce::Colour& color) :
-                    mass_(radius * 2), // Mass proportional to radius
+                   const juce::Colour& color,
+                   const MidiData& midi_data) :
+                    mass_(radius * kMassProportion),
                     radius_(radius),
+                    midi_data_(midi_data),
                     color_(color) {
   initial_position_ = vmml::Vector2f(static_cast<float>(init_pos.x),
                                      static_cast<float>(init_pos.y));
@@ -27,9 +29,11 @@ Particle::Particle(const juce::Point<float>& init_pos,
                    const juce::Point<float>& init_vel,
                    int radius,
                    float mass,
-                   const juce::Colour& color) :
+                   const juce::Colour& color,
+                   const MidiData& midi_data) :
                     mass_(mass),
                     radius_(radius),
+                    midi_data_(midi_data),
                     color_(color) {
   initial_position_ = vmml::Vector2f(init_pos.x, init_pos.y);
   current_position_ = initial_position_;
@@ -37,7 +41,7 @@ Particle::Particle(const juce::Point<float>& init_pos,
   CreateBoundingBox();
 }
 
-Particle::Particle(const Particle& other) {
+Particle::Particle(const Particle& other) : midi_data_(48, 0) {
   id_ = other.id_;
   time_ = other.time_;
   initial_position_ = other.initial_position_;
@@ -45,6 +49,7 @@ Particle::Particle(const Particle& other) {
   velocity_ = other.velocity_;
   mass_ = other.mass_;
   radius_ = other.radius_;
+  midi_data_ = other.midi_data_;
   color_ = other.color_;
   CreateBoundingBox();
 }
@@ -54,17 +59,28 @@ Particle::~Particle() {
 }
 
 void Particle::CreateBoundingBox() {
-  low_x_ = EndPoint(this, current_position_.x() - 2 * radius_, true);
-  high_x_ = EndPoint(this, current_position_.x() + 2 * radius_, false);
-  low_y_ = EndPoint(this, current_position_.y() - 2 * radius_, true);
-  high_y_ = EndPoint(this, current_position_.y() + 2 * radius_, false);
+  low_x_ = EndPoint(this,
+                    current_position_.x() - kBoundingBoxOfRadius * radius_,
+                    true);
+  high_x_ = EndPoint(this,
+                     current_position_.x() + kBoundingBoxOfRadius * radius_,
+                     false);
+  low_y_ = EndPoint(this,
+                    current_position_.y() - kBoundingBoxOfRadius * radius_,
+                    true);
+  high_y_ = EndPoint(this,
+                     current_position_.y() + kBoundingBoxOfRadius * radius_,
+                     false);
                       
   bounding_box_ = AxisAlignedBoundingBox(&low_x_, &high_x_, &low_y_, &high_y_);
 }
 
 void Particle::paint(juce::Graphics& g) {
   g.setColour(color_);
-  g.fillEllipse(radius_, radius_, radius_ * 2, radius_ * 2);
+  g.fillEllipse(radius_,
+                radius_,
+                radius_ * kBoundingBoxOfRadius,
+                radius_ * kBoundingBoxOfRadius);
 
 //  g.drawRect(0, 0, static_cast<int>(bounding_box_.bounds_x.second->GetValue() - bounding_box_.bounds_x.first->GetValue()), static_cast<int>(bounding_box_.bounds_y.second->GetValue() - bounding_box_.bounds_y.first->GetValue()));
 }
@@ -135,8 +151,8 @@ void Particle::SetCollisionVelocity(Particle* particle1,
   auto x1 = particle1->GetCurrentPosition();
   auto x2 = particle2->GetCurrentPosition();
   
-  const float mass_ratio_1 = 2 * m2 / (m1 + m2);
-  const float mass_ratio_2 = 2 * m1 / (m1 + m2);
+  const float mass_ratio_1 = kMomentumConstant * m2 / (m1 + m2);
+  const float mass_ratio_2 = kMomentumConstant * m1 / (m1 + m2);
   const float scalar_1 = vmml::dot(v1 - v2, x1 - x2) /
                          ((x1 - x2).length() * (x1 - x2).length());
   const float scalar_2 = vmml::dot(v2 - v1, x2 - x1) /
@@ -196,17 +212,17 @@ bool Particle::IsRemoved() const {
 }
 
 void Particle::KeepInBounds() {
-  if (current_position_.y() >= getParentHeight()) {
-    current_position_ = vmml::Vector2f(current_position_.x(),
-                                       getParentHeight() - radius_ - 1);
-    SetVelocity(velocity_);
-  }
-  
-  if (current_position_.x() >= getParentWidth()) {
-    current_position_ = vmml::Vector2f(getParentWidth() - radius_ - 1,
-                                       current_position_.y());
-    SetVelocity(velocity_);
-  }
+//  if (current_position_.y() >= getParentHeight()) {
+//    current_position_ = vmml::Vector2f(current_position_.x(),
+//                                       getParentHeight() - radius_ - 1);
+//    SetVelocity(velocity_);
+//  }
+//  
+//  if (current_position_.x() >= getParentWidth()) {
+//    current_position_ = vmml::Vector2f(getParentWidth() - radius_ - 1,
+//                                       current_position_.y());
+//    SetVelocity(velocity_);
+//  }
 
   if ((velocity_.y() < 0 && current_position_.y() - radius_ <= 0) ||
       (velocity_.y() > 0 && current_position_.y() + radius_ >= getParentHeight())) {

@@ -8,7 +8,8 @@
 #pragma once
 
 #define MAX_PARTICLES 600
-#define MAX_RADIUS 128
+#define MAX_RADIUS 32
+#define MIN_RADIUS 8
 
 #include <random>
 #include <chrono>

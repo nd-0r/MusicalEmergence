@@ -94,7 +94,7 @@ void ParticleManager::Reset() {
 
 void ParticleManager::paint(juce::Graphics& g) {
   g.fillAll(juce::Colours::black);
-  
+
 //  // TODO - remove
 //  for (auto& pair : collision_candidate_pairs_) {
 //    g.setColour(juce::Colours::white);
@@ -106,17 +106,20 @@ bool ParticleManager::AddParticlesFromMidiMessages() {
   while (!ap_.midi_in_message_queue_.empty()) {
     MidiData message = ap_.midi_in_message_queue_.front();
 
-    const int radius = message.note_num_;
-
+    int radius = int(std::ceilf((MAX_RADIUS - MIN_RADIUS)
+                                * (128 - message.note_num_) / 128.0f
+                                + MIN_RADIUS));
     juce::Point<int> init_pos((int) random_generator_() % (getWidth() - radius) + radius,
                               (int) random_generator_() % (getHeight() - radius) + radius);
-    juce::Point<int> init_vel = int(0.1f * message.velocity_) *
-                                  juce::Point<int>(1, 0);
+    juce::Point<int> init_vel = int(0.08f * message.velocity_) *
+                                  juce::Point<int>(random_generator_() % 2,
+                                                   random_generator_() % 2);
     auto color = kParticleColors[random_generator_() % kParticleColors.size()];
     Particle to_add = Particle(init_pos,
                                init_vel,
                                radius,
-                               color);
+                               color,
+                               message);
     ap_.midi_in_message_queue_.pop_front();
     if (!AddParticle(to_add)) return false;
   }
