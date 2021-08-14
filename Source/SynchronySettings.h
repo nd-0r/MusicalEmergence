@@ -18,7 +18,7 @@ public:
   static bool IsCollisionMode() { return collisionMode; }
   static bool ShouldShowAABBsAndPairs() { return showAABBsAndPairs; }
   static unsigned int GetClockSize() { return clockSize; }
-  static int GetClockStepSize() { return clockStepSize; }
+  static unsigned int GetClockStepSize() { return clockStepSize; }
   static double GetNoteLength() { return noteLength; }
 protected:
   constexpr static float kMinVelocityMultiplier = 0.1f;
@@ -34,7 +34,7 @@ protected:
   static bool showAABBsAndPairs;
   static bool collisionMode;
   static unsigned int clockSize;
-  static int clockStepSize;
+  static unsigned int clockStepSize;
   static double noteLength;
 };
 

@@ -24,7 +24,6 @@ public:
            int radius=4,
            const juce::Colour& color=juce::Colour(255, 255, 255),
            const MidiData& midi_data=MidiData(48, 0));
-
   Particle(SynchronyAudioProcessor& ap,
            const juce::Point<float>& init_pos,
            const juce::Point<float>& init_vel,
@@ -33,7 +32,6 @@ public:
            const juce::Colour& color=juce::Colour(255, 255, 255),
            const MidiData& midi_data=MidiData(48, 0));
   Particle(const Particle& other);
-  ~Particle() override;
   
   void paint(juce::Graphics& g) override;
   void mouseDown(const juce::MouseEvent& event) override;
@@ -41,9 +39,9 @@ public:
   
   void SetId(size_t to_id);
   void SetVelocity(const juce::Point<float>& new_velocity);
+  void NudgeClock(const Particle* neighbor);
   
   bool operator==(const Particle& other_particle) const;
-  
   bool operator!=(const Particle& other_particle) const;
   
   size_t GetId() const { return id_; }

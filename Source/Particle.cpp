@@ -58,10 +58,6 @@ Particle::Particle(const Particle& other) : midi_data_(other.midi_data_),
   CreateBoundingBox();
 }
 
-Particle::~Particle() {
-  // No dynamic storage to manage
-}
-
 void Particle::paint(juce::Graphics& g) {
   ++time_;
   time_ %= SynchronySettings::GetClockSize();
@@ -92,6 +88,9 @@ void Particle::mouseDown(const juce::MouseEvent& event) {
 }
 
 void Particle::UpdatePosition() {
+  if (!SynchronySettings::IsCollisionMode() && time_ == 0) {
+    PlayMidiNote();
+  }
   KeepInBounds();
   if (!removed_) {
     current_position_ += (velocity_ * SynchronySettings::GetVelocityMultiplier());
@@ -119,6 +118,13 @@ void Particle::SetId(size_t to_id) {
 
 void Particle::SetVelocity(const juce::Point<float>& new_velocity) {
   velocity_ = vmml::Vector2f(new_velocity.getX(), new_velocity.getY());
+}
+
+void Particle::NudgeClock(const Particle* neighbor) {
+  if (neighbor->time_ == 0) {
+    time_ += SynchronySettings::GetClockStepSize();
+    time_ %= SynchronySettings::GetClockSize();
+  }
 }
 
 bool Particle::DoParticlesCollide(const Particle* particle1,

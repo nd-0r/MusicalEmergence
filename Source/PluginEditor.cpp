@@ -31,6 +31,9 @@ SynchronyAudioProcessorEditor::SynchronyAudioProcessorEditor (SynchronyAudioProc
   addAndMakeVisible(show_aabbs_);
   show_aabbs_.addListener(this);
   
+  addAndMakeVisible(toggle_emergence_);
+  toggle_emergence_.addListener(this);
+  
   addAndMakeVisible(particle_speed_label_);
   particle_speed_label_.setColour(juce::Label::ColourIds::textColourId,
                                   getLookAndFeel().findColour(juce::Label::ColourIds::textColourId));
@@ -120,7 +123,13 @@ void SynchronyAudioProcessorEditor::resized()
                                  kAddParticleBtnHeight);
   show_aabbs_.setSize(static_cast<int>(width * kSettingsBoxWidth),
                       kAddParticleBtnHeight);
-  
+
+  toggle_emergence_.setTopLeftPosition(static_cast<int>(width * kMargin),
+                                       show_aabbs_.getY() + kSettingsSpacer +
+                                       kAddParticleBtnHeight);
+  toggle_emergence_.setSize(static_cast<int>(width * kSettingsBoxWidth),
+                            kAddParticleBtnHeight);
+
   clock_size_label_.setTopLeftPosition(static_cast<int>(width * kMargin),
                                         static_cast<int>(0.3 * height));
   clock_size_label_.setSize(static_cast<int>(width * kSettingsBoxWidth),
@@ -169,6 +178,8 @@ void SynchronyAudioProcessorEditor::buttonClicked(juce::Button* button) {
     pm_.TogglePause();
   } else if (button == &show_aabbs_) {
     SynchronySettings::showAABBsAndPairs = !SynchronySettings::showAABBsAndPairs;
+  } else if (button == &toggle_emergence_) {
+    SynchronySettings::collisionMode = !SynchronySettings::collisionMode;
   }
 }
 
@@ -178,7 +189,7 @@ void SynchronyAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
   } else if (slider == &clock_size_) {
     SynchronySettings::clockSize = static_cast<unsigned int>(slider->getValue());
   } else if (slider == &nudge_amount_) {
-    SynchronySettings::clockStepSize = static_cast<int>(slider->getValue());
+    SynchronySettings::clockStepSize = static_cast<unsigned int>(slider->getValue());
   } else if (slider == &note_length_) {
     SynchronySettings::noteLength = slider->getValue();
   }

@@ -56,6 +56,7 @@ private:
   juce::TextButton clear_{"Clear"};
   juce::TextButton pause_{"Pause"};
   juce::TextButton show_aabbs_{"Show AABBs"};
+  juce::TextButton toggle_emergence_{"Emergence"};
 
   juce::Label particle_speed_label_{"Particle Speed", "Particle Speed"};
   juce::Slider particle_speed_{juce::Slider::SliderStyle::LinearHorizontal,

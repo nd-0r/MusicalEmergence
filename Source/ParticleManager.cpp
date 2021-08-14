@@ -162,6 +162,11 @@ void ParticleManager::ResolveCollisions() {
       Particle::SetCollisionVelocity(p1, p2);
     }
     
+    // Emergence thing
+    if (!SynchronySettings::IsCollisionMode()) {
+      p1->NudgeClock(p2);
+    }
+    
     ++idx;
     ++iter;
   }
