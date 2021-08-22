@@ -40,6 +40,7 @@ public:
   void SetId(size_t to_id);
   void SetVelocity(const juce::Point<float>& new_velocity);
   void NudgeClock(const Particle* neighbor);
+  void StopPlaying();
   
   bool operator==(const Particle& other_particle) const;
   bool operator!=(const Particle& other_particle) const;
@@ -64,6 +65,8 @@ private:
   constexpr static float kMomentumConstant = 2.0f;
   constexpr static int kBoundingBoxOfRadius = 2;
   constexpr static int kMidiNoteLength = 10;
+  constexpr static double kMaxFlashLengthMS = 500;
+  constexpr static double kMinFlashLengthMS = 50;
 
   void PlayMidiNote();
   void CreateBoundingBox();
@@ -83,6 +86,8 @@ private:
   MidiData midi_data_;
 
   bool removed_ = false;
+  bool flash_ = false;
+  double play_time_ = 0.0f;
   EndPoint low_x_;
   EndPoint high_x_;
   EndPoint low_y_;

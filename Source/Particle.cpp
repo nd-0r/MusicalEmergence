@@ -59,14 +59,21 @@ Particle::Particle(const Particle& other) : midi_data_(other.midi_data_),
 }
 
 void Particle::paint(juce::Graphics& g) {
-  ++time_;
-  time_ %= SynchronySettings::GetClockSize();
-
-  if (!SynchronySettings::IsCollisionMode()) {
-    g.setColour(time_ == 0 ? juce::Colours::white : color_);
+  if (flash_) {
+    double flash_progress = juce::Time::getMillisecondCounterHiRes() - play_time_;
+    double flash_length = (kMaxFlashLengthMS - kMinFlashLengthMS) *
+                          SynchronySettings::GetNoteLength() / SynchronySettings::GetMaxNoteLength() +
+                          kMinFlashLengthMS;
+    float brightness = float(-4.0 * (flash_progress / flash_length - 0.5) *
+                             (flash_progress / flash_length - 0.5) + 2.0); // quadratic
+    g.setColour(color_.withBrightness(brightness));
+    if (flash_progress > flash_length) {
+      flash_ = false;
+    }
   } else {
     g.setColour(color_);
   }
+
   g.fillEllipse(radius_,
                 radius_,
                 radius_ * kBoundingBoxOfRadius,
@@ -88,8 +95,12 @@ void Particle::mouseDown(const juce::MouseEvent& event) {
 }
 
 void Particle::UpdatePosition() {
-  if (!SynchronySettings::IsCollisionMode() && time_ == 0) {
+  ++time_;
+  if (!SynchronySettings::IsCollisionMode() &&
+      time_ > SynchronySettings::GetClockSize()) {
+    time_ = 0; // reset clock
     PlayMidiNote();
+    flash_ = true;
   }
   KeepInBounds();
   if (!removed_) {
@@ -121,9 +132,11 @@ void Particle::SetVelocity(const juce::Point<float>& new_velocity) {
 }
 
 void Particle::NudgeClock(const Particle* neighbor) {
-  if (neighbor->time_ == 0) {
+  if (neighbor->flash_) {
     time_ += SynchronySettings::GetClockStepSize();
-    time_ %= SynchronySettings::GetClockSize();
+    if (time_ > SynchronySettings::GetClockSize()) {
+      time_ = SynchronySettings::GetClockSize();
+    }
   }
 }
 
@@ -183,7 +196,11 @@ bool Particle::operator!=(const Particle& other_particle) const {
 }
 
 void Particle::PlayMidiNote() {
-  ap_.OutputMidiMessage(midi_data_);
+  if (play_time_ + SynchronySettings::GetNoteLength() <
+      juce::Time::getMillisecondCounterHiRes()) {
+    ap_.OutputMidiMessage(midi_data_);
+    play_time_ = juce::Time::getMillisecondCounterHiRes();
+  }
 }
 
 void Particle::CreateBoundingBox() {
@@ -230,7 +247,7 @@ void Particle::KeepInBounds() {
 void Particle::SetVelocity(const vmml::Vector2f& new_velocity) {
   initial_position_ = current_position_;
   velocity_ = new_velocity;
-  time_ = 0;
+//  time_ = 0;
 }
 
 bool Particle::AreParticlesApproaching(const Particle* particle1,

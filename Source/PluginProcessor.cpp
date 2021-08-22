@@ -172,7 +172,7 @@ void SynchronyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
       off_message.setTimeStamp(juce::Time::getMillisecondCounterHiRes() *
                                0.001 - startTime);
       midiMessages.addEvent(off_message, 0);
-      
+
       midi_out_message_queue_.erase(iter++);
       continue;
     }

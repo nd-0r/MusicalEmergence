@@ -20,6 +20,7 @@ public:
   static unsigned int GetClockSize() { return clockSize; }
   static unsigned int GetClockStepSize() { return clockStepSize; }
   static double GetNoteLength() { return noteLength; }
+  static double GetMaxNoteLength() { return kMaxNoteLength; }
 protected:
   constexpr static float kMinVelocityMultiplier = 0.1f;
   constexpr static float kMaxVelocityMultiplier = 2.0f;
